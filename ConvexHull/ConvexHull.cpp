@@ -79,9 +79,47 @@ vector<Point> GetConvexHull_EP(vector <Point> Points)
 	return Result;
 }
 
+int ComparePoint(Point A, Point B1, Point B2)
+//compare vector(AB1) to vector(AB2) 
+//AB1 greater than AB2 return 1
+//equal return 0
+//smaller return -1
+//Erro return -2
+{
+	int result = ToLeftTest(A, B1, B2);
+	if (result == 1)
+	{
+		return -1;
+	}
+	else if (result == -1)
+	{
+		return 1; //greater
+	}
+	else if (result == 0)
+	{
+		return 0;
+	}
+	else
+		return -2;
+}
 vector<Point> BubbleSortExtremePoints(vector <Point> Points)
-//冒泡排序排序极点 O(nlogn)
+//冒泡排序排序极点 O(n^2)
 //输入必须得是极点
 {
-	
+	for (int num = 1; num < Points.size() - 1; num++)
+	{
+		for (int i = 1; i < Points.size() - num; i++)
+		{
+			int compareresult = ComparePoint(Points[0], Points[i], Points[i + 1]);
+			if (compareresult == 1)
+			{
+				Point temp = Points[i];
+				Points[i] = Points[i + 1];
+				Points[i + 1] = temp;
+			}
+			else if (compareresult == -2)
+				printf("sort erro");
+		}
+	}
+	return Points;
 }

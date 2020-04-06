@@ -49,11 +49,18 @@ void Test_InTriangle()
 void Test_GetConvexHull_EP()
 {
 	vector <Point> Points;
-	Points = GenerateRandomPoint(50, 0, 10, 0, 10);
+	Points = GenerateRandomPoint(100, 0, 10, 0, 10);
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
 	Points = GetConvexHull_EP(Points);
 	AddBufferPoints(Points, 5.0f);
+	vector <Point> temp = Points;
+	temp.push_back(Points[0]);
+	//AddBufferLines(temp, 1.0f);
+	Points = BubbleSortExtremePoints(Points);
+	temp = Points;
+	temp.push_back(Points[0]);
+	AddBufferLines(temp, 1.0f);
 	CloseGLplot();
 	
 }
