@@ -40,9 +40,71 @@ int InTriangle(Point PointA, Point PointB, Point PointC,Point PointD)
 	}		
 }
 
+vector<Point> DeleteRepeatPoints(vector<Point> Points) //删除点集中重复的点
+{
+	vector <Point> uniquePoints;
+	for (int i = 0; i < Points.size(); i++)
+	{
+		int equal = 0;
+		for (int j = 0; j < uniquePoints.size(); j++)
+		{
+			if (Points[i] == uniquePoints[j])
+			{
+				equal = 1;
+				break;
+			}
+		}
+		if (equal == 0)
+			uniquePoints.push_back(Points[i]);
+	}
+
+	//vector<int> type;
+	//for (int i = 0; i < Points.size(); i++)
+	//	type.push_back(0);
+	//int num = 0;
+	//for (int i = 0; i < Points.size()-1; i++)
+	//{
+	//	if (type[i] == 0)
+	//	{
+	//		num++;
+	//		type[i] = num;
+	//		for (int j = i + 1; j < Points.size(); j++)
+	//		{
+	//			if (type[j] == 0)
+	//			{
+	//				if (Points[i] == Points[j])
+	//					type[j] = num;
+	//			}
+	//		}
+	//	}
+	//}
+	//for (int i = 0; i < Points.size()-1; i++)
+	//{
+	//	num = type[i];
+	//	for (int j = i + 1; j < Points.size(); j++)
+	//	{
+	//		int flag = 0;
+	//		while (num == type[j])
+	//		{
+	//			if (Points.begin() + j != Points.end())
+	//			{
+	//				Points.erase(Points.begin() + j);
+	//				flag = 1;
+	//			}
+	//			else
+	//				break;
+	//		}
+	//		if (flag == 1)
+	//			j--;
+	//	}
+	//}
+	return uniquePoints;
+}
+
 vector<Point> GetConvexHull_EP(vector <Point> Points)
 //From Points,get ConvexHull.O(n^4) Extreme Point
 {
+	Points = DeleteRepeatPoints(Points);
 	if (Points.size() <= 3)
 		return Points;
 
@@ -121,5 +183,66 @@ vector<Point> BubbleSortExtremePoints(vector <Point> Points)
 				printf("sort erro");
 		}
 	}
+	return Points;
+}
+
+vector<Point> GetConvexHull_EE(vector<Point>Points)
+//O(n^3)
+{
+	//Points = DeleteRepeatPoints(Points);
+	vector<Point> EE;//储存EE边
+	Points.push_back(Points[0]);
+	int i,j;
+	for (i = 0; i < Points.size()-1; i++)
+	{
+		for (j = i + 1; j < Points.size(); j++)
+		{
+			if (Points[i] == Points[j]) //如果去掉这个，运行出错
+				continue;
+			int flag = 0;
+			int init;
+			int k;
+			int breakflag = 0;
+			for (k = 0; k < Points.size() - 1; k++)
+			{
+				if (k != i&&k != j)
+				{
+					if (flag == 0)
+					{
+						init = ToLeftTest(Points[i], Points[j], Points[k]);
+						flag = 1;
+					}
+					else
+					{
+						int thistest = ToLeftTest(Points[i], Points[j], Points[k]);
+						/*if (thistest == -2)
+						{
+							cout << Points[i].Point_X << " " << Points[i].Point_Y << " " << Points[i].Point_Z << endl;
+							cout << Points[j].Point_X << " " << Points[j].Point_Y << " " << Points[j].Point_Z << endl;
+							cout << Points[k].Point_X << " " << Points[k].Point_Y << " " << Points[k].Point_Z << endl;
+							cout << (Points[i] == Points[j])<<endl;
+							cout << -2<<endl;
+						}*/
+						//cout << thistest<<endl;
+						if (thistest != init && init != 0 && thistest != 0)
+						{
+							//IsEE.push_back(0);
+							breakflag = 1;
+							break;
+						}
+						if (thistest!=0)
+							init = thistest;
+					}
+				}
+			}
+			if (breakflag!=1)
+			{
+				EE.push_back(Points[i]);
+				EE.push_back(Points[j]);
+			}
+		}
+	}
+	Points = DeleteRepeatPoints(EE);
+	//Points = EE;
 	return Points;
 }

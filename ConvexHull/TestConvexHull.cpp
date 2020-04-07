@@ -50,6 +50,13 @@ void Test_GetConvexHull_EP()
 {
 	vector <Point> Points;
 	Points = GenerateRandomPoint(100, 0, 10, 0, 10);
+	//vector <Point> Points2;
+	//Points2 = GenerateRandomPoint(0, 11, 11, 11, 11);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	Points.push_back(Points2[i]);
+	//}
+
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
 	Points = GetConvexHull_EP(Points);
@@ -65,13 +72,39 @@ void Test_GetConvexHull_EP()
 	
 }
 
+void Test_GetConvexHull_EE()
+{
+	vector <Point> Points;
+	Points = GenerateRandomPoint(2500, 0, 10, 0, 10);
+	vector <Point> Points2;
+	Points2 = GenerateRandomPoint(500, 10, 10, 5, 5);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
+
+	OpenGLplot();
+	AddBufferPoints(Points, 2.0f);
+	Points = GetConvexHull_EE(Points);
+	AddBufferPoints(Points, 5.0f);
+	vector <Point> temp = Points;
+	//temp.push_back(Points[0]);
+
+	Points = BubbleSortExtremePoints(Points);
+	temp = Points;
+	temp.push_back(Points[0]);
+	AddBufferLines(temp, 1.0f);
+	CloseGLplot();
+
+}
+
 void main()
 {
 	
 	//Test_ToLeftTest();
 	//Test_InTriangle();
-	Test_GetConvexHull_EP();
-	
+	//Test_GetConvexHull_EP();
+	Test_GetConvexHull_EE();
 }
 
 

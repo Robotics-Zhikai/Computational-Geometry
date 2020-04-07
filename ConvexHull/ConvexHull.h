@@ -46,4 +46,6 @@ int InTriangle(Point PointA, Point PointB, Point PointC, Point PointD);
 vector<Point> GetConvexHull_EP(vector <Point> Points);
 
 vector<Point> BubbleSortExtremePoints(vector <Point> Points);
+
+vector<Point> GetConvexHull_EE(vector<Point>Points);
 #endif
