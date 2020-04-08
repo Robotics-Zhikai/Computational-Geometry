@@ -8,3 +8,5 @@ XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementati
 20200406 O(n^4)的凸包算法 to-left-test 极点的冒泡排序 Point的比较
 
 20200407 O(n^3)的凸包算法 去除重复点算法
+
+20200408 O(n)的ICPT算法 重复点的处理 更新冒泡排序算法 O(n)的CheckSorted算法

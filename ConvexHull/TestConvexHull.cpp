@@ -64,7 +64,7 @@ void Test_GetConvexHull_EP()
 	vector <Point> temp = Points;
 	temp.push_back(Points[0]);
 	//AddBufferLines(temp, 1.0f);
-	Points = BubbleSortExtremePoints(Points);
+	Points = BubbleSortPoints(Points);
 	temp = Points;
 	temp.push_back(Points[0]);
 	AddBufferLines(temp, 1.0f);
@@ -90,7 +90,7 @@ void Test_GetConvexHull_EE()
 	vector <Point> temp = Points;
 	//temp.push_back(Points[0]);
 
-	Points = BubbleSortExtremePoints(Points);
+	Points = BubbleSortPoints(Points);
 	temp = Points;
 	temp.push_back(Points[0]);
 	AddBufferLines(temp, 1.0f);

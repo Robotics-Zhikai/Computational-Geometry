@@ -164,10 +164,18 @@ int ComparePoint(Point A, Point B1, Point B2)
 	else
 		return -2;
 }
-vector<Point> BubbleSortExtremePoints(vector <Point> Points)
-//冒泡排序排序极点 O(n^2)
-//输入必须得是极点
+vector<Point> BubbleSortPoints(vector <Point> Points)
+//冒泡排序排序点集 O(n^2) 不一定是极点集
+//虽然不一定是极点集，但是只有极点集排序才有意义，若普通点集排序则会出现没有啥几何意义的情况
+//去掉第一个点重复的情况
 {
+	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
+	Points1.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+		if ((Points[i] == Points[0]) == 0)
+			Points1.push_back(Points[i]);
+	Points = Points1;
+
 	for (int num = 1; num < Points.size() - 1; num++)
 	{
 		for (int i = 1; i < Points.size() - num; i++)
@@ -179,8 +187,11 @@ vector<Point> BubbleSortExtremePoints(vector <Point> Points)
 				Points[i] = Points[i + 1];
 				Points[i + 1] = temp;
 			}
-			else if (compareresult == -2)
+			else if (compareresult == -2) //出现这种情况是排序的初始点有重合,但一开始的代码已经保证了不会出现这样的情况
+			{
 				printf("sort erro");
+				break;
+			}
 		}
 	}
 	return Points;
@@ -245,4 +256,107 @@ vector<Point> GetConvexHull_EE(vector<Point>Points)
 	Points = DeleteRepeatPoints(EE);
 	//Points = EE;
 	return Points;
+}
+
+int CheckSorted(vector<Point> Points)
+//判断Points是否按Sorted排列 如果所有点都重复，那么Sorted判断仍为1 
+//如果排序的初始点有些重复，对程序的性能不影响。
+{
+	if (Points.size() < 3)
+		return 1;
+	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
+	Points1.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+		if ((Points[i] == Points[0]) == 0)
+			Points1.push_back(Points[i]);
+	Points = Points1;
+
+	int lastcomresult; 
+	if (Points.size()>=3)
+		lastcomresult = ComparePoint(Points[0], Points[1], Points[2]);
+
+	for (int i = 2; i < Points.size()-1; i++)
+	{
+		int comresult = ComparePoint(Points[0], Points[i], Points[i + 1]);
+		if (((lastcomresult == 1 || lastcomresult == 0) && (comresult == 1 || comresult == 0))\
+			|| ((lastcomresult == -1 || lastcomresult == 0) && (comresult == -1 || comresult == 0)))
+		{
+		}
+		else
+		{
+			return 0;
+		}
+		lastcomresult = comresult;
+	}
+	return 1;
+}
+int InConvexPolygonTest(vector<Point> Points,Point A)
+//判断点A是否在Points构成的凸多边形内
+//Points必须得是极点集，不要求不重复
+//O(n)
+//在内部return1 在边上 return0 在外部 return-1 Error return-2 
+{
+	if (Points.size() == 1)
+	{
+		if (A == Points[0])
+			return 0;
+		else
+			return -1;
+	}
+	if (Points.size() == 2)
+	{
+		if (Points[0] == Points[1])
+		{
+			if (A == Points[0])
+				return 0;
+			else
+				return -1;
+		}
+		else
+		{
+			int result = ToLeftTest(Points[0], Points[1],A);
+			if (result == 1 || result == -1)
+				return -1;
+			else if (result == 0)
+				return 0;
+			else
+				return -2;
+		}
+	}
+	if (CheckSorted(Points)==0)
+	{
+		Points = BubbleSortPoints(Points);
+	}
+	Points.push_back(Points[0]);
+	vector<int> testresult;
+	for (int i = 0; i < Points.size()-1; i++)
+	{
+		if (Points[i] == Points[i + 1])
+			continue;
+		int currentresult = ToLeftTest(Points[i], Points[i+1], A);
+		testresult.push_back(currentresult);
+	}
+	int last = testresult[0];
+	int i;
+	int count0 = 0;
+	for (i = 0; i < testresult.size(); i++)
+	{
+		if (testresult[i] == 0)
+			count0++;
+		if (testresult[i] != 0 && testresult[i] != last)
+		{
+			break;
+		}
+		if (testresult[i]!=0)
+			last = testresult[i];
+	}
+	if (i >= testresult.size())
+	{
+		if (count0 >= 1)
+			return 0;
+		else
+			return 1;
+	}
+	else
+		return -1;
 }
