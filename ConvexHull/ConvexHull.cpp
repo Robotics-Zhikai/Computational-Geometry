@@ -382,7 +382,7 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 	CHPoints.push_back(Points[0]);
 	for (int i = 1; i < Points.size(); i++)
 	{
-		if (*Points.end() == Points[i])
+		if (*(CHPoints.end()-1) == Points[i])
 			continue;
 		//CHPoints = BubbleSortPoints(CHPoints); //似乎根本就用不着排序
 		int Testresult = InConvexPolygonTest(CHPoints, Points[i]); //O(n)
@@ -443,8 +443,50 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 			Tangent.erase(Tangent.begin() + eraseIndex[0]);//此时tangent应该只有两个才对 erase之前是三个元素
 			CHPoints.erase(CHPoints.begin() + Index);
 		}
+		vector<int> neweraseindex;
+		if (CHPoints.size() > 3)
+		{
+			vector <Point> newpoints;
+			newpoints.push_back(CHPoints[Tangent[0]]);
+			newpoints.push_back(CHPoints[Tangent[1]]);
+			newpoints.push_back(Points[i]);
+			for (j = 0; j < CHPoints.size(); j++)
+			{
+				if (j != Tangent[0] && j != Tangent[1] && j != i)
+				{
+					int result = InConvexPolygonTest(newpoints, CHPoints[j]);
+					if (result == 1|| result==0 )
+						neweraseindex.push_back(j);
+				}
+			}
+		}
+		if (neweraseindex.empty() == 0)
+		{
+			vector<Point> newChpoints;
+			int numerase = 0;
+			for (j = 0; j < CHPoints.size(); j++)
+			{
+				if (j != neweraseindex[numerase])
+					newChpoints.push_back(CHPoints[j]);
+				else
+				{
+					numerase++;
+					if (numerase >= neweraseindex.size())
+						numerase = neweraseindex.size() - 1;
+				}
+			}
+			CHPoints = newChpoints;
+		}
+		//for (j = 0; j < neweraseindex.size(); j++)
+		//{
+		//	CHPoints.erase(CHPoints.begin() + neweraseindex[j]);
+		//}
+
+		
+
+
 		int storeindex;
-		for (j = 0; j < CHPoints.size()-1; j++)
+		for (j = 1; j < CHPoints.size()-1; j++)
 		{
 			if ((ComparePoint(CHPoints[0], Points[i], CHPoints[j]) == 1) && (ComparePoint(CHPoints[0], Points[i], CHPoints[j + 1]) == -1))
 			{
@@ -452,7 +494,18 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 				break;
 			}
 		}
-		CHPoints.insert(CHPoints.begin() + j + 1,Points[i]);
-		CHPoints.push_back(Points[i]);
+		if (j >= CHPoints.size() - 1)
+		{
+			int comp1, comp2;
+			comp1 = ComparePoint(CHPoints[0], Points[i], CHPoints[1]);
+			comp2 = ComparePoint(CHPoints[0], Points[i], CHPoints[2]);
+			if (((comp1 == 1) && (comp2 == 1)) || ((comp1 == -1) && (comp2 == -1)))
+				CHPoints.insert(CHPoints.begin() + 1, Points[i]);
+			else
+				CHPoints.push_back(Points[i]);
+		}
+		else
+			CHPoints.insert(CHPoints.begin() + storeindex + 1,Points[i]);
 	}
+	return CHPoints;
 }

@@ -101,9 +101,9 @@ void Test_GetConvexHull_EE()
 void Test_GetConvexHull_IC()//增量法求凸包
 {
 	vector <Point> Points;
-	Points = GenerateRandomPoint(2500, 0, 10, 0, 10);
+	Points = GenerateRandomPoint(500, 0, 10, 0, 10);
 	vector <Point> Points2;
-	Points2 = GenerateRandomPoint(500, 10, 10, 5, 5);
+	Points2 = GenerateRandomPoint(0, 10, 10, 5, 5);
 	for (int i = 0; i < Points2.size(); i++)
 	{
 		Points.push_back(Points2[i]);
@@ -126,11 +126,12 @@ void Test_GetConvexHull_IC()//增量法求凸包
 
 void main()
 {
-	cout << sqrt(3.777);
+	//cout << sqrt(3.777);
 	//Test_ToLeftTest();
 	//Test_InTriangle();
 	//Test_GetConvexHull_EP();
-	Test_GetConvexHull_EE();
+	//Test_GetConvexHull_EE();
+	Test_GetConvexHull_IC();
 }
 
 
