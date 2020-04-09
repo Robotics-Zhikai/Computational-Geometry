@@ -48,4 +48,6 @@ vector<Point> GetConvexHull_EP(vector <Point> Points);
 vector<Point> BubbleSortPoints(vector <Point> Points);
 
 vector<Point> GetConvexHull_EE(vector<Point>Points);
+
+vector <Point> GetCHIncrementalConstruction(vector <Point> Points);
 #endif

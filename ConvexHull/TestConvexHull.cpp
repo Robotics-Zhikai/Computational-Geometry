@@ -98,9 +98,35 @@ void Test_GetConvexHull_EE()
 
 }
 
+void Test_GetConvexHull_IC()//增量法求凸包
+{
+	vector <Point> Points;
+	Points = GenerateRandomPoint(2500, 0, 10, 0, 10);
+	vector <Point> Points2;
+	Points2 = GenerateRandomPoint(500, 10, 10, 5, 5);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
+
+	OpenGLplot();
+	AddBufferPoints(Points, 2.0f);
+	Points = GetCHIncrementalConstruction(Points);
+	AddBufferPoints(Points, 5.0f);
+	vector <Point> temp = Points;
+	//temp.push_back(Points[0]);
+
+	Points = BubbleSortPoints(Points);
+	temp = Points;
+	temp.push_back(Points[0]);
+	AddBufferLines(temp, 1.0f);
+	CloseGLplot();
+
+}
+
 void main()
 {
-	
+	cout << sqrt(3.777);
 	//Test_ToLeftTest();
 	//Test_InTriangle();
 	//Test_GetConvexHull_EP();

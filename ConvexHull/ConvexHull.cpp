@@ -164,11 +164,47 @@ int ComparePoint(Point A, Point B1, Point B2)
 	else
 		return -2;
 }
+int CheckSorted(vector<Point> Points)
+//判断Points是否按Sorted排列 如果所有点都重复，那么Sorted判断仍为1 
+//如果排序的初始点有些重复，对程序的性能不影响。
+//O(n)的复杂度
+{
+	if (Points.size() < 3)
+		return 1;
+	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
+	Points1.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+		if ((Points[i] == Points[0]) == 0)
+			Points1.push_back(Points[i]);
+	Points = Points1;
+
+	int lastcomresult;
+	if (Points.size() >= 3)
+		lastcomresult = ComparePoint(Points[0], Points[1], Points[2]);
+
+	for (int i = 2; i < Points.size() - 1; i++)
+	{
+		int comresult = ComparePoint(Points[0], Points[i], Points[i + 1]);
+		if (((lastcomresult == 1 || lastcomresult == 0) && (comresult == 1 || comresult == 0))\
+			|| ((lastcomresult == -1 || lastcomresult == 0) && (comresult == -1 || comresult == 0)))
+		{
+		}
+		else
+		{
+			return 0;
+		}
+		lastcomresult = comresult;
+	}
+	return 1;
+}
+
 vector<Point> BubbleSortPoints(vector <Point> Points)
 //冒泡排序排序点集 O(n^2) 不一定是极点集
 //虽然不一定是极点集，但是只有极点集排序才有意义，若普通点集排序则会出现没有啥几何意义的情况
 //去掉第一个点重复的情况
 {
+	if (CheckSorted(Points) == 1) //说明已经排好序了
+		return Points;
 	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
 	Points1.push_back(Points[0]);
 	for (int i = 1; i < Points.size(); i++)
@@ -258,38 +294,6 @@ vector<Point> GetConvexHull_EE(vector<Point>Points)
 	return Points;
 }
 
-int CheckSorted(vector<Point> Points)
-//判断Points是否按Sorted排列 如果所有点都重复，那么Sorted判断仍为1 
-//如果排序的初始点有些重复，对程序的性能不影响。
-{
-	if (Points.size() < 3)
-		return 1;
-	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
-	Points1.push_back(Points[0]);
-	for (int i = 1; i < Points.size(); i++)
-		if ((Points[i] == Points[0]) == 0)
-			Points1.push_back(Points[i]);
-	Points = Points1;
-
-	int lastcomresult; 
-	if (Points.size()>=3)
-		lastcomresult = ComparePoint(Points[0], Points[1], Points[2]);
-
-	for (int i = 2; i < Points.size()-1; i++)
-	{
-		int comresult = ComparePoint(Points[0], Points[i], Points[i + 1]);
-		if (((lastcomresult == 1 || lastcomresult == 0) && (comresult == 1 || comresult == 0))\
-			|| ((lastcomresult == -1 || lastcomresult == 0) && (comresult == -1 || comresult == 0)))
-		{
-		}
-		else
-		{
-			return 0;
-		}
-		lastcomresult = comresult;
-	}
-	return 1;
-}
 int InConvexPolygonTest(vector<Point> Points,Point A)
 //判断点A是否在Points构成的凸多边形内
 //Points必须得是极点集，不要求不重复
@@ -359,4 +363,96 @@ int InConvexPolygonTest(vector<Point> Points,Point A)
 	}
 	else
 		return -1;
+}
+
+double normPoints(Point A, Point B)
+//返回A B之间的距离
+{
+	return sqrt((A.Point_X - B.Point_X)*(A.Point_X - B.Point_X)+ \
+		(A.Point_Y - B.Point_Y)*(A.Point_Y - B.Point_Y)+\
+		(A.Point_Z - B.Point_Z)*(A.Point_Z - B.Point_Z));
+}
+vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
+//用增量法得到凸包 但是未经过排序
+{
+	//Points = DeleteRepeatPoints(Points);
+	if (Points.size() <= 3)
+		return Points;
+	vector <Point> CHPoints;
+	CHPoints.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+	{
+		if (*Points.end() == Points[i])
+			continue;
+		//CHPoints = BubbleSortPoints(CHPoints); //似乎根本就用不着排序
+		int Testresult = InConvexPolygonTest(CHPoints, Points[i]); //O(n)
+		if (Testresult == 1 || Testresult == 0)
+			continue;
+		else if (Testresult == -2)
+		{
+			printf("出现错误\n");
+			return CHPoints;
+		}
+		int j;
+		//到这一步的话就根本不可能出现CHPoints中有重合点的情况
+		if (CHPoints.size() <= 2)
+		{
+			int InsertIndex;
+			CHPoints.push_back(Points[i]);
+			continue;
+		}
+		vector <int> Tangent;
+		for (j = 0; j < CHPoints.size(); j++)
+		{
+			int leftnum = j - 1;
+			int rightnum = j + 1;
+			if (leftnum < 0)
+				leftnum = CHPoints.size() - 1;
+			if (rightnum >= CHPoints.size())
+				rightnum = 0;
+			int L = ToLeftTest(Points[i], CHPoints[j], CHPoints[leftnum]);
+			int R = ToLeftTest(Points[i], CHPoints[j], CHPoints[rightnum]);
+			if (((L == 1 || L == 0) && (R == 1 || R == 0)) || ((L == -1 || L == 0) && (R == -1 || R == 0)))
+				Tangent.push_back(j);
+		}
+		vector <int> eraseIndex;
+		for (j = 0; j < Tangent.size(); j++)
+		{
+			int last, next;
+			if (j == Tangent.size() - 1)
+			{
+				last = j;
+				next = 0;
+			}
+			else
+			{
+				last = j;
+				next = j + 1;
+			}
+			if (ToLeftTest(CHPoints[Tangent[last]], CHPoints[Tangent[next]], Points[i]) == 0)
+			{
+				if (normPoints(Points[i], CHPoints[Tangent[last]]) < normPoints(Points[i], CHPoints[Tangent[next]]))
+					eraseIndex.push_back(last);
+				else
+					eraseIndex.push_back(next);
+			}
+		}
+		if (eraseIndex.empty() == 0)
+		{
+			int Index = Tangent[eraseIndex[0]];
+			Tangent.erase(Tangent.begin() + eraseIndex[0]);//此时tangent应该只有两个才对 erase之前是三个元素
+			CHPoints.erase(CHPoints.begin() + Index);
+		}
+		int storeindex;
+		for (j = 0; j < CHPoints.size()-1; j++)
+		{
+			if ((ComparePoint(CHPoints[0], Points[i], CHPoints[j]) == 1) && (ComparePoint(CHPoints[0], Points[i], CHPoints[j + 1]) == -1))
+			{
+				storeindex = j;
+				break;
+			}
+		}
+		CHPoints.insert(CHPoints.begin() + j + 1,Points[i]);
+		CHPoints.push_back(Points[i]);
+	}
 }
