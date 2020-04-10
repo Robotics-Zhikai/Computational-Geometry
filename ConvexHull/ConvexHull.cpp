@@ -58,46 +58,6 @@ vector<Point> DeleteRepeatPoints(vector<Point> Points) //删除点集中重复的点
 			uniquePoints.push_back(Points[i]);
 	}
 
-	//vector<int> type;
-	//for (int i = 0; i < Points.size(); i++)
-	//	type.push_back(0);
-	//int num = 0;
-	//for (int i = 0; i < Points.size()-1; i++)
-	//{
-	//	if (type[i] == 0)
-	//	{
-	//		num++;
-	//		type[i] = num;
-	//		for (int j = i + 1; j < Points.size(); j++)
-	//		{
-	//			if (type[j] == 0)
-	//			{
-	//				if (Points[i] == Points[j])
-	//					type[j] = num;
-	//			}
-	//		}
-	//	}
-	//}
-	//for (int i = 0; i < Points.size()-1; i++)
-	//{
-	//	num = type[i];
-	//	for (int j = i + 1; j < Points.size(); j++)
-	//	{
-	//		int flag = 0;
-	//		while (num == type[j])
-	//		{
-	//			if (Points.begin() + j != Points.end())
-	//			{
-	//				Points.erase(Points.begin() + j);
-	//				flag = 1;
-	//			}
-	//			else
-	//				break;
-	//		}
-	//		if (flag == 1)
-	//			j--;
-	//	}
-	//}
 	return uniquePoints;
 }
 
@@ -347,7 +307,7 @@ int InConvexPolygonTest(vector<Point> Points,Point A)
 	{
 		if (testresult[i] == 0)
 			count0++;
-		if (testresult[i] != 0 && testresult[i] != last)
+		if (testresult[i] != 0 && testresult[i] != last && last!=0)
 		{
 			break;
 		}
@@ -363,6 +323,67 @@ int InConvexPolygonTest(vector<Point> Points,Point A)
 	}
 	else
 		return -1;
+}
+
+vector <Point> EraseVectorPoints(vector <Point> Points,vector<int> eraseIndex)
+//删除eraseIndex索引的Points点集
+{
+	if (eraseIndex.size() <= 0)
+		return Points;
+	sort(eraseIndex.begin(), eraseIndex.end());
+	vector<int> uniqueeraseindex;
+	uniqueeraseindex.push_back(eraseIndex[0]);
+	for (int i = 1; i < eraseIndex.size(); i++)
+	{
+		if (*(uniqueeraseindex.end()-1) == eraseIndex[i])
+			continue;
+		uniqueeraseindex.push_back(eraseIndex[i]);
+	}
+
+	vector<Point> newpoints;
+	int numerase = 0;
+	for (int j = 0; j < Points.size(); j++)
+	{
+		if (j != uniqueeraseindex[numerase])
+			newpoints.push_back(Points[j]);
+		else
+		{
+			numerase++;
+			if (numerase >= uniqueeraseindex.size())
+				numerase = uniqueeraseindex.size() - 1;
+		}
+	}
+	return newpoints;
+}
+
+vector <int> EraseVectorint(vector <int> Points, vector<int> eraseIndex)
+{
+	if (eraseIndex.size() <= 0)
+		return Points;
+	sort(eraseIndex.begin(), eraseIndex.end());
+	vector<int> uniqueeraseindex;
+	uniqueeraseindex.push_back(eraseIndex[0]);
+	for (int i = 1; i < eraseIndex.size(); i++)
+	{
+		if (*(uniqueeraseindex.end()-1) == eraseIndex[i])
+			continue;
+		uniqueeraseindex.push_back(eraseIndex[i]);
+	}
+
+	vector<int> newpoints;
+	int numerase = 0;
+	for (int j = 0; j < Points.size(); j++)
+	{
+		if (j != uniqueeraseindex[numerase])
+			newpoints.push_back(Points[j]);
+		else
+		{
+			numerase++;
+			if (numerase >= uniqueeraseindex.size())
+				numerase = uniqueeraseindex.size() - 1;
+		}
+	}
+	return newpoints;
 }
 
 double normPoints(Point A, Point B)
@@ -412,13 +433,26 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 				rightnum = 0;
 			int L = ToLeftTest(Points[i], CHPoints[j], CHPoints[leftnum]);
 			int R = ToLeftTest(Points[i], CHPoints[j], CHPoints[rightnum]);
+			if (L == 0 || R == 0)
+			{
+				printf("d");
+			}
 			if (((L == 1 || L == 0) && (R == 1 || R == 0)) || ((L == -1 || L == 0) && (R == -1 || R == 0)))
 				Tangent.push_back(j);
 		}
+		//if (Tangent.size() > 2)
+		//{
+		//	printf("s");
+		//}
+
+		//对于点判断在多边形外但是与多边形的某条边或某两条边在同一直线上
 		vector <int> eraseIndex;
 		for (j = 0; j < Tangent.size(); j++)
 		{
 			int last, next;
+		/*	last = j;
+			next = k;*/
+				
 			if (j == Tangent.size() - 1)
 			{
 				last = j;
@@ -437,22 +471,31 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 					eraseIndex.push_back(next);
 			}
 		}
-		if (eraseIndex.empty() == 0)
+
+		vector <int> Index;
+		if (eraseIndex.size() >= 2)
 		{
-			int Index = Tangent[eraseIndex[0]];
-			Tangent.erase(Tangent.begin() + eraseIndex[0]);//此时tangent应该只有两个才对 erase之前是三个元素
-			CHPoints.erase(CHPoints.begin() + Index);
+			printf("s");
 		}
+		for (j = 0; j < eraseIndex.size(); j++)
+			Index.push_back(Tangent[eraseIndex[j]]);
+		Tangent = EraseVectorint(Tangent, eraseIndex);
+		CHPoints = EraseVectorPoints(CHPoints, Index);
+
+		//去掉新引入点造成的点集在多边形内的点
 		vector<int> neweraseindex;
-		if (CHPoints.size() > 3)
+		if (CHPoints.size() >= 3)
 		{
+			
 			vector <Point> newpoints;
+			
 			newpoints.push_back(CHPoints[Tangent[0]]);
+			
 			newpoints.push_back(CHPoints[Tangent[1]]);
 			newpoints.push_back(Points[i]);
 			for (j = 0; j < CHPoints.size(); j++)
 			{
-				if (j != Tangent[0] && j != Tangent[1] && j != i)
+				if (j != Tangent[0] && j != Tangent[1] )
 				{
 					int result = InConvexPolygonTest(newpoints, CHPoints[j]);
 					if (result == 1|| result==0 )
@@ -460,35 +503,41 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 				}
 			}
 		}
-		if (neweraseindex.empty() == 0)
+		Point TangentPointA = CHPoints[Tangent[0]];
+		Point TangentPointB = CHPoints[Tangent[1]];
+		CHPoints = EraseVectorPoints(CHPoints, neweraseindex);
+
+		//找到切点，将新点插入二者之间
+		for (j = 0; j < CHPoints.size(); j++)
 		{
-			vector<Point> newChpoints;
-			int numerase = 0;
-			for (j = 0; j < CHPoints.size(); j++)
+			int last, next;
+			if (j == CHPoints.size() - 1)
 			{
-				if (j != neweraseindex[numerase])
-					newChpoints.push_back(CHPoints[j]);
-				else
-				{
-					numerase++;
-					if (numerase >= neweraseindex.size())
-						numerase = neweraseindex.size() - 1;
-				}
+				last = j;
+				next = 0;
 			}
-			CHPoints = newChpoints;
+			else
+			{
+				last = j;
+				next = j + 1;
+			}
+			if ((CHPoints[last] == TangentPointA && CHPoints[next] == TangentPointB) || \
+				(CHPoints[last] == TangentPointB && CHPoints[next] == TangentPointA))
+				break;
 		}
-		//for (j = 0; j < neweraseindex.size(); j++)
-		//{
-		//	CHPoints.erase(CHPoints.begin() + neweraseindex[j]);
-		//}
+		if (j >= CHPoints.size())
+			CHPoints.push_back(Points[i]);
+		else
+			CHPoints.insert(CHPoints.begin() + j + 1,Points[i]);
 
-		
-
-
-		int storeindex;
+		//用下边的处理方法复杂、出错、耗时多
+		/*int storeindex;
 		for (j = 1; j < CHPoints.size()-1; j++)
 		{
-			if ((ComparePoint(CHPoints[0], Points[i], CHPoints[j]) == 1) && (ComparePoint(CHPoints[0], Points[i], CHPoints[j + 1]) == -1))
+			int comp1 = ComparePoint(CHPoints[0], Points[i], CHPoints[j]);
+			int comp2 = ComparePoint(CHPoints[0], Points[i], CHPoints[j + 1]);
+			if (((comp1 == 1) && (comp2 == -1))\
+				|| ((comp1 == -1) && (comp2 == 1)))
 			{
 				storeindex = j;
 				break;
@@ -496,16 +545,23 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 		}
 		if (j >= CHPoints.size() - 1)
 		{
-			int comp1, comp2;
-			comp1 = ComparePoint(CHPoints[0], Points[i], CHPoints[1]);
-			comp2 = ComparePoint(CHPoints[0], Points[i], CHPoints[2]);
-			if (((comp1 == 1) && (comp2 == 1)) || ((comp1 == -1) && (comp2 == -1)))
-				CHPoints.insert(CHPoints.begin() + 1, Points[i]);
+			if (CHPoints.size() >= 3)
+			{
+				int comp1, comp2;
+				comp1 = ComparePoint(CHPoints[0], Points[i], CHPoints[1]);
+				comp2 = ComparePoint(CHPoints[0], Points[i], CHPoints[2]);
+				if (((comp1 == 1) && (comp2 == 1)) || ((comp1 == -1) && (comp2 == -1)))
+					CHPoints.insert(CHPoints.begin()+1 , Points[i]);
+				else
+					CHPoints.push_back(Points[i]);
+			}
 			else
+			{
 				CHPoints.push_back(Points[i]);
+			}
 		}
 		else
-			CHPoints.insert(CHPoints.begin() + storeindex + 1,Points[i]);
+			CHPoints.insert(CHPoints.begin() + storeindex + 1,Points[i]);*/
 	}
 	return CHPoints;
 }

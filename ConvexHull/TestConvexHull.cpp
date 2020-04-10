@@ -100,14 +100,22 @@ void Test_GetConvexHull_EE()
 
 void Test_GetConvexHull_IC()//增量法求凸包
 {
+	//还存在的问题：偶尔会出现vector的错误
+	//同时加上竖直和水平的很多点，就会出现找到好几个切点的情况而出现错误，可能与数值计算有关
 	vector <Point> Points;
-	Points = GenerateRandomPoint(500, 0, 10, 0, 10);
-	vector <Point> Points2;
-	Points2 = GenerateRandomPoint(0, 10, 10, 5, 5);
-	for (int i = 0; i < Points2.size(); i++)
-	{
-		Points.push_back(Points2[i]);
-	}
+	Points = GenerateRandomPoint(13000, 0, 10, 0, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
+
+	//vector <Point> Points2;
+	//Points2 = GenerateRandomPoint(500, 9.99, 9.99, 0, 10);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	Points.push_back(Points2[i]);
+	//}
+	//Points2 = GenerateRandomPoint(500, 0, 9.99, 10, 10);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	Points.push_back(Points2[i]);
+	//}
 
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
@@ -124,6 +132,25 @@ void Test_GetConvexHull_IC()//增量法求凸包
 
 }
 
+void Test_ICPT()
+{
+	vector <Point> Points;
+	Points.push_back(Point(0, 0, 0));
+	Points.push_back(Point(5, 0, 0));
+	Points.push_back(Point(0, 5, 0));
+	Points.push_back(Point(5, 5, 0));
+
+	vector <Point> Points2;
+	Points2.push_back(Point(0, 4, 0));
+	cout<< InConvexPolygonTest(Points, Points2[0]);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	int result = InConvexPolygonTest(Points, Points2[i]);
+	//	if (result == 0|| result==1)
+	//		cout<<"e";
+	//}
+	system("pause");
+}
 void main()
 {
 	//cout << sqrt(3.777);
@@ -132,6 +159,7 @@ void main()
 	//Test_GetConvexHull_EP();
 	//Test_GetConvexHull_EE();
 	Test_GetConvexHull_IC();
+	//Test_ICPT();
 }
 
-
+	

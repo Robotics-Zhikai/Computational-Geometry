@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <vector>
 #include <ctime>
+#include <algorithm>
 using namespace std;
 
 class Point
@@ -42,6 +43,8 @@ public:
 int ToLeftTest(Point PointA, Point PointB, Point PointC); //From PointA to PointB,Test PointC.Left return 1,right return -1,on return 0
 														 //Erro return -2 including z not equal and so on 
 int InTriangle(Point PointA, Point PointB, Point PointC, Point PointD);
+
+int InConvexPolygonTest(vector<Point> Points, Point A);
 
 vector<Point> GetConvexHull_EP(vector <Point> Points);
 
