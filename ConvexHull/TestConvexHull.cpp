@@ -151,6 +151,38 @@ void Test_ICPT()
 	//}
 	system("pause");
 }
+
+void Test_GetConvexHull_JM()//增量法求凸包
+{
+	vector <Point> Points;
+	Points = GenerateRandomPoint(13000, 0, 10, 1, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
+
+	/*vector <Point> Points2;
+	Points2 = GenerateRandomPoint(500,0, 9.99, 0.5, 0.5);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}*/
+	//Points2 = GenerateRandomPoint(500, 0, 9.99, 10, 10);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	Points.push_back(Points2[i]);
+	//}
+
+	OpenGLplot();
+	AddBufferPoints(Points, 2.0f);
+	Points = GetCHJarvisMarch(Points);
+	AddBufferPoints(Points, 5.0f);
+	vector <Point> temp = Points;
+	//temp.push_back(Points[0]);
+
+	Points = BubbleSortPoints(Points);
+	temp = Points;
+	temp.push_back(Points[0]);
+	AddBufferLines(temp, 1.0f);
+	CloseGLplot();
+
+}
 void main()
 {
 	//cout << sqrt(3.777);
@@ -158,8 +190,9 @@ void main()
 	//Test_InTriangle();
 	//Test_GetConvexHull_EP();
 	//Test_GetConvexHull_EE();
-	Test_GetConvexHull_IC();
+	//Test_GetConvexHull_IC();
 	//Test_ICPT();
+	Test_GetConvexHull_JM();
 }
 
 	

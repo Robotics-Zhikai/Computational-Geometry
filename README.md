@@ -12,3 +12,5 @@ XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementati
 20200408 O(n)的ICPT算法 重复点的处理 更新冒泡排序算法 O(n)的CheckSorted算法
 
 20200410 O(n^2)的IC凸包算法 有一些bug暂时没法解决
+
+20200411 O(n)的LTL算法 部分JM算法

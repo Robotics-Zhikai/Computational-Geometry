@@ -53,4 +53,6 @@ vector<Point> BubbleSortPoints(vector <Point> Points);
 vector<Point> GetConvexHull_EE(vector<Point>Points);
 
 vector <Point> GetCHIncrementalConstruction(vector <Point> Points);
+
+vector <Point> GetCHJarvisMarch(vector <Point> Points);
 #endif

@@ -565,3 +565,48 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 	}
 	return CHPoints;
 }
+
+Point FindLowestThenLeftmost(vector <Point> Points)
+//找到最低和最左的点
+{
+	if (Points.size() == 0)
+		return Point(0, 0, 0);
+	if (Points.size() == 1)
+		return Points[0];
+	double ymin = Points[0].Point_Y;
+	int YminIndex = 0;
+	vector <Point> yminPoints;
+	yminPoints.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+	{
+		if (Points[i].Point_Y < ymin)
+		{
+			ymin = Points[i].Point_Y;
+			YminIndex = i;
+			yminPoints.clear();
+			yminPoints.push_back(Points[i]);
+		}
+		else if (Points[i].Point_Y == ymin)
+			yminPoints.push_back(Points[i]);
+	}
+	double xmin = yminPoints[0].Point_X;
+	Point result = yminPoints[0];
+	for (int i = 1; i < yminPoints.size(); i++)
+	{
+		if (yminPoints[i].Point_X < xmin)
+			result = yminPoints[i];
+	}
+	return result;
+}
+vector <Point> GetCHJarvisMarch(vector <Point> Points)
+{
+	Point LTL = FindLowestThenLeftmost(Points);
+	Point Last = LTL;
+	for (int i = 0; i < Points.size(); i++)
+	{
+		if (Points[i] == Last)
+			continue;
+
+	}
+	return Points;
+}
