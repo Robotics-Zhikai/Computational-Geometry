@@ -1,5 +1,5 @@
 # Computational-Geometry
-XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementation code by Zhikai.
+学堂在线清华计算几何课程学习（邓俊辉）.Algorithm implementation code by Zhikai.
 
 //Update record
 
