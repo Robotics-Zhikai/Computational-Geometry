@@ -155,8 +155,8 @@ void Test_ICPT()
 void Test_GetConvexHull_JM()//增量法求凸包
 {
 	vector <Point> Points;
-	Points = GenerateRandomPoint(10, 0, 10, 1, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
-
+	Points = GenerateRandomPoint(280000, 0, 10, 1, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
+	Points.push_back(Point(1, 0.5, 0));
 	/*vector <Point> Points2;
 	Points2 = GenerateRandomPoint(500,0, 9.99, 0.5, 0.5);
 	for (int i = 0; i < Points2.size(); i++)
@@ -176,10 +176,11 @@ void Test_GetConvexHull_JM()//增量法求凸包
 	vector <Point> temp = Points;
 	//temp.push_back(Points[0]);
 
-	Points = BubbleSortPoints(Points);
+	//Points = BubbleSortPoints(Points);
 	temp = Points;
 	temp.push_back(Points[0]);
 	AddBufferLines(temp, 1.0f);
+	cout << Points.size() - 1 << endl;
 	CloseGLplot();
 
 }

@@ -16,3 +16,5 @@ XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementati
 20200411 O(n)的LTL算法 部分JM算法
 
 20200412 部分JM算法
+
+20200413 未考虑共线的JM算法 280000个点10秒内完成 O(hn) output sensitive h为顶点个数

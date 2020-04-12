@@ -646,7 +646,7 @@ vector <Point> GetCHJarvisMarch(vector <Point> Points)
 	vector<Point> ReusltPoints;
 	for (int i = 0; i < Result.size(); i++)
 	{
-		ReusltPoints.push_back(Points[i]);
+		ReusltPoints.push_back(Points[Result[i]]);
 	}
 
 
