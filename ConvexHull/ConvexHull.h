@@ -35,6 +35,10 @@ public:
 		else
 			return 0;
 	}
+	int operator !=(Point P2)
+	{
+		return !(operator == (P2));
+	}
 };
 
 

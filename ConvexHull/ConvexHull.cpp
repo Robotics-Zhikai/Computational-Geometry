@@ -566,13 +566,15 @@ vector <Point> GetCHIncrementalConstruction(vector <Point> Points)
 	return CHPoints;
 }
 
-Point FindLowestThenLeftmost(vector <Point> Points)
+int FindLowestThenLeftmost(vector <Point> Points)
 //找到最低和最左的点
 {
 	if (Points.size() == 0)
-		return Point(0, 0, 0);
+		//return Point(0, 0, 0);
+		return -1;
 	if (Points.size() == 1)
-		return Points[0];
+		//return Points[0];
+		return 0;
 	double ymin = Points[0].Point_Y;
 	int YminIndex = 0;
 	vector <Point> yminPoints;
@@ -596,17 +598,93 @@ Point FindLowestThenLeftmost(vector <Point> Points)
 		if (yminPoints[i].Point_X < xmin)
 			result = yminPoints[i];
 	}
-	return result;
+	int Index = 0;
+	for (int i = 0; i < Points.size(); i++)
+	{
+		if (Points[i] == result)
+		{
+			Index = i;
+			break;
+		}
+	}
+	//return result;
+	return Index;
 }
+
 vector <Point> GetCHJarvisMarch(vector <Point> Points)
 {
-	Point LTL = FindLowestThenLeftmost(Points);
-	Point Last = LTL;
+	int LTL = FindLowestThenLeftmost(Points);
+	//Point Last = Points[LTL];
+	int Last = LTL;
+	vector <int> Result;
+	Result.push_back(Last);
+
+	while (1)
+	{
+		int MaxIndex;
+		int num = 0;
+		for (int i = 0; i < Points.size(); i++)
+		{
+			if (i == Last)
+				continue;
+			num++;
+			if (num == 1)
+				MaxIndex = i;
+			else
+			{
+				if (ToLeftTest(Points[Last], Points[MaxIndex], Points[i]) == -1)
+				{
+					MaxIndex = i;
+				}
+			}
+		}
+		if (MaxIndex == LTL)
+			break;
+		Result.push_back(MaxIndex);
+		Last = MaxIndex;
+	}
+	vector<Point> ReusltPoints;
+	for (int i = 0; i < Result.size(); i++)
+	{
+		ReusltPoints.push_back(Points[i]);
+	}
+
+
+
+
+
+
+
+
+
+	
+	
+	/*int lasttest;
 	for (int i = 0; i < Points.size(); i++)
 	{
 		if (Points[i] == Last)
 			continue;
+		int num = 0;
+		int j;
+		for (j = 0; j < Points.size(); j++)
+		{
+			if (j != i&&Points[j] != Last)
+			{
+				num++;
+				int test = ToLeftTest(Last, Points[i], Points[j]);
+				if (num == 1)
+					lasttest = test;
+				if (test != lasttest&&test != 0 && lasttest != 0)
+					break;
+				lasttest = test;
+			}
+		}
+		if (j >= Points.size())
+		{
+			Result.push_back(Points[i]);
+			Last = Points[i];
+		}
+	}*/
 
-	}
-	return Points;
+	return ReusltPoints;
 }

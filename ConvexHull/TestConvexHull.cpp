@@ -155,7 +155,7 @@ void Test_ICPT()
 void Test_GetConvexHull_JM()//增量法求凸包
 {
 	vector <Point> Points;
-	Points = GenerateRandomPoint(13000, 0, 10, 1, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
+	Points = GenerateRandomPoint(10, 0, 10, 1, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
 
 	/*vector <Point> Points2;
 	Points2 = GenerateRandomPoint(500,0, 9.99, 0.5, 0.5);

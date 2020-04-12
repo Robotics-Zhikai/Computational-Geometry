@@ -14,3 +14,5 @@ XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementati
 20200410 O(n^2)的IC凸包算法 有一些bug暂时没法解决
 
 20200411 O(n)的LTL算法 部分JM算法
+
+20200412 部分JM算法
