@@ -1,5 +1,5 @@
 # Computational-Geometry
-XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementation code by Zhikai.
+学堂在线清华计算几何课程学习（邓俊辉）.Algorithm implementation code by Zhikai.
 
 //Update record
 
@@ -18,3 +18,5 @@ XTZX Tsinghua Computational Geometry Class by Junhui Deng.Algorithm implementati
 20200412 部分JM算法
 
 20200413 未考虑共线的JM算法 280000个点10秒内完成 O(hn) output sensitive h为顶点个数
+
+20200413 考虑共线的JM算法 考虑共线后存在数值计算的问题，tolefttest设置1e-10的阈值

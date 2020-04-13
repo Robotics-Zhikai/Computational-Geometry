@@ -10,11 +10,12 @@ int ToLeftTest(Point PointA, Point PointB, Point PointC)
 	}
 	double Area = PointA.Point_X * PointB.Point_Y - PointA.Point_Y * PointB.Point_X + PointB.Point_X * PointC.Point_Y \
 		- PointB.Point_Y * PointC.Point_X + PointC.Point_X * PointA.Point_Y - PointC.Point_Y * PointA.Point_X;
-	if (Area > 0)
+	double yuzhi = 1e-10;
+	if (Area > yuzhi)
 		return 1;
-	else if (Area < 0)
+	else if (Area < -yuzhi)
 		return -1;
-	else
+	else if (Area<yuzhi && Area>-yuzhi)
 		return 0;
 }
 
@@ -596,7 +597,10 @@ int FindLowestThenLeftmost(vector <Point> Points)
 	for (int i = 1; i < yminPoints.size(); i++)
 	{
 		if (yminPoints[i].Point_X < xmin)
+		{
 			result = yminPoints[i];
+			xmin = yminPoints[i].Point_X;
+		}
 	}
 	int Index = 0;
 	for (int i = 0; i < Points.size(); i++)
@@ -611,54 +615,115 @@ int FindLowestThenLeftmost(vector <Point> Points)
 	return Index;
 }
 
-vector <Point> GetCHJarvisMarch(vector <Point> Points)
+Point FindLowestThenLeftmostPoint(vector <Point> Points)
+//找到最低和最左的点
 {
-	int LTL = FindLowestThenLeftmost(Points);
-	//Point Last = Points[LTL];
-	int Last = LTL;
-	vector <int> Result;
-	Result.push_back(Last);
-
-	while (1)
+	if (Points.size() == 0)
+		return Point(0, 0, 0);
+		//return -1;
+	if (Points.size() == 1)
+		return Points[0];
+		//return 0;
+	double ymin = Points[0].Point_Y;
+	int YminIndex = 0;
+	vector <Point> yminPoints;
+	yminPoints.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
 	{
-		int MaxIndex;
+		if (Points[i].Point_Y < ymin)
+		{
+			ymin = Points[i].Point_Y;
+			YminIndex = i;
+			yminPoints.clear();
+			yminPoints.push_back(Points[i]);
+		}
+		else if (Points[i].Point_Y == ymin)
+			yminPoints.push_back(Points[i]);
+	}
+	double xmin = yminPoints[0].Point_X;
+	Point result = yminPoints[0];
+	for (int i = 1; i < yminPoints.size(); i++)
+	{
+		if (yminPoints[i].Point_X < xmin)
+		{
+			result = yminPoints[i];
+			xmin = yminPoints[i].Point_X;
+		}
+	}
+	/*int Index = 0;
+	for (int i = 0; i < Points.size(); i++)
+	{
+		if (Points[i] == result)
+		{
+			Index = i;
+			break;
+		}
+	}*/
+	return result;
+	//return Index;
+}
+vector <Point> GetCHJarvisMarch(vector <Point> Points)
+////jarvismarch算法
+//O(hn) output sensitive h为凸包顶点数
+{
+	Point LTL = FindLowestThenLeftmostPoint(Points);
+	Point Last = LTL;
+	vector <Point> ResultPoints;
+	ResultPoints.push_back(Last);
+
+	int k;
+	for (k = 0; k < Points.size(); k++)
+	{
+		Point MaxIndex;
 		int num = 0;
 		for (int i = 0; i < Points.size(); i++)
 		{
-			if (i == Last)
+			if (Points[i] == Last)
 				continue;
 			num++;
 			if (num == 1)
-				MaxIndex = i;
+				MaxIndex = Points[i];
 			else
 			{
-				if (ToLeftTest(Points[Last], Points[MaxIndex], Points[i]) == -1)
+				if (Last != MaxIndex)
 				{
-					MaxIndex = i;
+					int test = ToLeftTest(Last, MaxIndex, Points[i]);
+					if (test == -1)
+					{
+						MaxIndex = Points[i];
+					}
+				/*	else if(test!=1)
+					{
+						cout << test << endl;
+					}*/
 				}
 			}
 		}
 		if (MaxIndex == LTL)
-			break;
-		Result.push_back(MaxIndex);
+			break;	
+		ResultPoints.push_back(MaxIndex);
 		Last = MaxIndex;
 	}
-	vector<Point> ReusltPoints;
+	if (k >= Points.size())
+	{
+		printf("erro");
+		return Points;
+	}
+	/*vector<Point> ReusltPoints;
 	for (int i = 0; i < Result.size(); i++)
 	{
 		ReusltPoints.push_back(Points[Result[i]]);
+	}*/
+	vector<int> eraseIndex;
+	for (int i = 0; i < ResultPoints.size()-2; i++)
+	{
+		if (ToLeftTest(ResultPoints[i], ResultPoints[i + 1], ResultPoints[i + 2]) == 0)
+		{
+			eraseIndex.push_back(i + 1);
+		}
 	}
+	ResultPoints = EraseVectorPoints(ResultPoints, eraseIndex);
 
-
-
-
-
-
-
-
-
-	
-	
 	/*int lasttest;
 	for (int i = 0; i < Points.size(); i++)
 	{
@@ -685,6 +750,5 @@ vector <Point> GetCHJarvisMarch(vector <Point> Points)
 			Last = Points[i];
 		}
 	}*/
-
-	return ReusltPoints;
+	return ResultPoints;
 }

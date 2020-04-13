@@ -152,22 +152,44 @@ void Test_ICPT()
 	system("pause");
 }
 
-void Test_GetConvexHull_JM()//增量法求凸包
+void Test_GetConvexHull_JM()//jarvis march算法
 {
 	vector <Point> Points;
-	Points = GenerateRandomPoint(280000, 0, 10, 1, 10); //可在可接受的时间内找到73000的点 但是会出现vector错误
-	Points.push_back(Point(1, 0.5, 0));
-	/*vector <Point> Points2;
-	Points2 = GenerateRandomPoint(500,0, 9.99, 0.5, 0.5);
+	
+
+	Points = GenerateRandomPoint(280000, 0, 10, 1, 10);
+	//Points.push_back(Point(11, 5, 0));
+	//Points.push_back(Point(10, 0.5, 0));
+	//
+
+	/*Points.push_back(Point(0.1, 0.5, 0));
+	Points.push_back(Point(0.2, 0.5, 0));
+	Points.push_back(Point(0.3, 0.5, 0));
+	Points.push_back(Point(0.3, 0.5, 0));
+	Points.push_back(Point(0.2, 0.5, 0));
+	Points.push_back(Point(0.1, 0.5, 0));*/
+	/*for (double i = 0; i < 10; i=i+0.1)
+	{
+		Points.push_back(Point(i, 0.5, 0));
+	}
+	for (double i = 10; i > 0; i = i - 0.1)
+	{
+		Points.push_back(Point(i, 0.5, 0));
+	}
+	*/
+
+	vector <Point> Points2;
+	Points2 = GenerateRandomPoint(1335,0, 9.99, 0.5, 0.5);
 	for (int i = 0; i < Points2.size(); i++)
 	{
 		Points.push_back(Points2[i]);
-	}*/
-	//Points2 = GenerateRandomPoint(500, 0, 9.99, 10, 10);
-	//for (int i = 0; i < Points2.size(); i++)
-	//{
-	//	Points.push_back(Points2[i]);
-	//}
+	}
+	//Points.push_back(Point(-1, 0.5, 0));
+	Points2 = GenerateRandomPoint(1500, 11,11, 1, 10);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
 
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
