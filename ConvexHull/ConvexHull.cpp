@@ -752,3 +752,70 @@ vector <Point> GetCHJarvisMarch(vector <Point> Points)
 	}*/
 	return ResultPoints;
 }
+
+Point FindLowestThenRightmostPoint(vector <Point> Points)
+//找到最低和最右的点
+{
+	if (Points.size() == 0)
+		return Point(0, 0, 0);
+	//return -1;
+	if (Points.size() == 1)
+		return Points[0];
+	//return 0;
+	double ymin = Points[0].Point_Y;
+	int YminIndex = 0;
+	vector <Point> yminPoints;
+	yminPoints.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+	{
+		if (Points[i].Point_Y < ymin)
+		{
+			ymin = Points[i].Point_Y;
+			YminIndex = i;
+			yminPoints.clear();
+			yminPoints.push_back(Points[i]);
+		}
+		else if (Points[i].Point_Y == ymin)
+			yminPoints.push_back(Points[i]);
+	}
+	double xmax = yminPoints[0].Point_X;
+	Point result = yminPoints[0];
+	for (int i = 1; i < yminPoints.size(); i++)
+	{
+		if (yminPoints[i].Point_X > xmax)
+		{
+			result = yminPoints[i];
+			xmax = yminPoints[i].Point_X;
+		}
+	}
+	/*int Index = 0;
+	for (int i = 0; i < Points.size(); i++)
+	{
+	if (Points[i] == result)
+	{
+	Index = i;
+	break;
+	}
+	}*/
+	return result;
+	//return Index;
+}
+
+vector <Point> PreSorting(vector <Point> Points, Point LTL, Point LTR)
+{
+	for (int num = 1; num < Points.size() - 1; num++)
+	{
+		for (int i = 0; i < Points.size()-num; i++)
+		{
+			if (Points[i] == LTL)
+				continue;
+
+		}
+	}
+}
+vector <Point> GetCHGrahamScan(vector<Point> Points)
+{
+	Point LTL = FindLowestThenLeftmostPoint(Points);
+	Point LTR = FindLowestThenRightmostPoint(Points);
+
+}
