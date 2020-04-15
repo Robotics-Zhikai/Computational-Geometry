@@ -59,4 +59,6 @@ vector<Point> GetConvexHull_EE(vector<Point>Points);
 vector <Point> GetCHIncrementalConstruction(vector <Point> Points);
 
 vector <Point> GetCHJarvisMarch(vector <Point> Points);
+
+vector <Point> GetCHGrahamScan(vector<Point> Points);
 #endif

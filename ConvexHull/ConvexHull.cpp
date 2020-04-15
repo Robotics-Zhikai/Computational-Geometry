@@ -801,21 +801,105 @@ Point FindLowestThenRightmostPoint(vector <Point> Points)
 	//return Index;
 }
 
-vector <Point> PreSorting(vector <Point> Points, Point LTL, Point LTR)
+vector <Point> PreSorting(vector <Point> Points, Point LTL)
 {
-	for (int num = 1; num < Points.size() - 1; num++)
+	vector <Point> DeleteRepeatPoint;
+	for (int i = 0; i < Points.size(); i++) 
 	{
-		for (int i = 0; i < Points.size()-num; i++)
+		if (Points[i] == LTL)
+			continue;
+		DeleteRepeatPoint.push_back(Points[i]);
+	}
+	for (int num = 1; num < DeleteRepeatPoint.size() ; num++)
+	{
+		for (int i = 0; i < DeleteRepeatPoint.size()-num; i++)
 		{
-			if (Points[i] == LTL)
-				continue;
-
+			int test = ToLeftTest(LTL, DeleteRepeatPoint[i], DeleteRepeatPoint[i+1]);
+			if (test == 1)
+			{
+				Point temp;
+				temp = DeleteRepeatPoint[i];
+				DeleteRepeatPoint[i] = DeleteRepeatPoint[i + 1];
+				DeleteRepeatPoint[i + 1] = temp;
+			}
 		}
+	}
+	return DeleteRepeatPoint;
+}
+int IfInLine(Point A, Point B,Point C) 
+//判断C在共AB组成的直线的基础上是否在两端点内
+//如果在，那么return 1
+//否则 如果在AB方向上之外 return -1
+//如果在BA方向上之外，return -3
+//如果等于A或者B return -2
+{
+	if (A == C || B == C)
+		return -2;
+	if (A.Point_X == B.Point_X)
+	{
+		if ((C.Point_Y<B.Point_Y && C.Point_Y>A.Point_Y) || (C.Point_Y<A.Point_Y && C.Point_Y>B.Point_Y))
+			return 1;
+		else if (C.Point_Y > B.Point_Y)
+			return -1;
+		else if (C.Point_Y < A.Point_Y)
+			return -3;
+	}
+	else
+	{
+		if ((C.Point_X<B.Point_X && C.Point_X>A.Point_X) || (C.Point_X<A.Point_X && C.Point_X>B.Point_X))
+			return 1;
+		else if (C.Point_X > B.Point_X)
+			return -1;
+		else if (C.Point_X < A.Point_X)
+			return -3;
 	}
 }
 vector <Point> GetCHGrahamScan(vector<Point> Points)
 {
 	Point LTL = FindLowestThenLeftmostPoint(Points);
-	Point LTR = FindLowestThenRightmostPoint(Points);
+	vector <Point> T_Stack = PreSorting(Points, LTL); //主要耗费时间耗费在排序这里了
+	Point NextEP = *(T_Stack.end()-1);
+	T_Stack.pop_back();
+
+	vector <Point> S_Stack;
+	S_Stack.push_back(LTL);
+	S_Stack.push_back(NextEP);
+	while (T_Stack.empty() == 0)
+	{
+		Point A = *(S_Stack.end() - 2);
+		Point B = *(S_Stack.end() - 1);
+		Point C = *(T_Stack.end() - 1);
+		int test = ToLeftTest(A, B, C);
+		if (test == 0)
+		{
+			int ifinli = IfInLine(A, B, C);
+			if (ifinli == 1 || ifinli == -2 || ifinli == -3)
+				T_Stack.pop_back();
+			else if (ifinli == -1)
+			{
+				S_Stack.push_back(C);
+				T_Stack.pop_back();
+			}
+		}
+		else if (test == 1)
+		{
+			S_Stack.push_back(C);
+			T_Stack.pop_back();
+		}
+		else if (test == -1)
+		{
+			S_Stack.pop_back();
+		}
+	}
+	vector<int> eraseIndex; //删除共线的点内部的所有点
+	for (int i = 0; i < S_Stack.size() - 2; i++)
+	{
+		if (ToLeftTest(S_Stack[i], S_Stack[i + 1], S_Stack[i + 2]) == 0)
+		{
+			eraseIndex.push_back(i + 1);
+		}
+	}
+	S_Stack = EraseVectorPoints(S_Stack, eraseIndex);
+	return S_Stack;
 
 }

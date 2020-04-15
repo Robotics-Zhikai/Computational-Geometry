@@ -206,6 +206,63 @@ void Test_GetConvexHull_JM()//jarvis marchÀ„∑®
 	CloseGLplot();
 
 }
+
+void Test_GetConvexHull_GS()//GrahamScanÀ„∑®
+{
+	vector <Point> Points;
+
+
+	Points = GenerateRandomPoint(5000, 0, 10, 1, 10);
+	//Points.push_back(Point(11, 5, 0));
+	//Points.push_back(Point(10, 0.5, 0));
+	//
+
+	/*Points.push_back(Point(0.1, 0.5, 0));
+	Points.push_back(Point(0.2, 0.5, 0));
+	Points.push_back(Point(0.3, 0.5, 0));
+	Points.push_back(Point(0.3, 0.5, 0));
+	Points.push_back(Point(0.2, 0.5, 0));
+	Points.push_back(Point(0.1, 0.5, 0));*/
+	/*for (double i = 0; i < 10; i=i+0.1)
+	{
+	Points.push_back(Point(i, 0.5, 0));
+	}
+	for (double i = 10; i > 0; i = i - 0.1)
+	{
+	Points.push_back(Point(i, 0.5, 0));
+	}
+	*/
+
+	vector <Point> Points2;
+	Points2 = GenerateRandomPoint(850, 0, 9.99, 0.5, 0.5);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
+	//Points.push_back(Point(-1, 0.5, 0));
+	Points2 = GenerateRandomPoint(850, 9, 9, 0.5, 10);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
+	
+
+	OpenGLplot();
+	AddBufferPoints(Points, 2.0f);
+	Points = GetCHGrahamScan(Points);
+	AddBufferPoints(Points, 5.0f);
+	vector <Point> temp = Points;
+	//temp.push_back(Points[0]);
+
+	//Points = BubbleSortPoints(Points);
+	temp = Points;
+	temp.push_back(Points[0]);
+	AddBufferLines(temp, 1.0f);
+	cout << Points.size() - 1 << endl;
+	CloseGLplot();
+
+}
+
 void main()
 {
 	//cout << sqrt(3.777);
@@ -215,7 +272,8 @@ void main()
 	//Test_GetConvexHull_EE();
 	//Test_GetConvexHull_IC();
 	//Test_ICPT();
-	Test_GetConvexHull_JM();
+	//Test_GetConvexHull_JM();
+	Test_GetConvexHull_GS();
 }
 
 	
