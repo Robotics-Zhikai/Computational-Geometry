@@ -27,8 +27,16 @@
 
 20200428 前边提到的GrahamScan算法主要花费时间在预排序上，是因为预排序使用的冒泡排序O(n^2)，冒泡排序就非常费时间，因此现在把冒泡排序用归并排序（nlogn）代替，速度有显著提升！
 
-预排序是冒泡排序展示：3 4
+预排序是冒泡排序展示：
 
-预排序是归并排序展示：1.png 2.png
+![image](https://github.com/Robotics-Zhikai/Computational-Geometry/blob/master/image/3.png)
+
+![image](https://github.com/Robotics-Zhikai/Computational-Geometry/blob/master/image/4.png)
+
+预排序是归并排序展示：
+
+![image](https://github.com/Robotics-Zhikai/Computational-Geometry/blob/master/image/1.png)
+
+![image](https://github.com/Robotics-Zhikai/Computational-Geometry/blob/master/image/2.png)
 
 可以看到，通过修改预排序算法，显著提升了算法的速度！
