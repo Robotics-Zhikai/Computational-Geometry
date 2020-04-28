@@ -926,21 +926,40 @@ vector <Point> PreSorting(vector <Point> Points, Point LTL)
 			continue;
 		DeleteRepeatPoint.push_back(Points[i]);
 	}
-	//DeleteRepeatPoint = MergeSortRecur(LTL, DeleteRepeatPoint, 0, DeleteRepeatPoint.size()-1);//归并排序
-	for (int num = 1; num < DeleteRepeatPoint.size() ; num++)
+
+	//用n的时间复杂度判断是否已经是排序完成
+	DeleteRepeatPoint.insert(DeleteRepeatPoint.begin(), LTL);
+	if ((DeleteRepeatPoint.size()>=2)&&(CheckSorted(DeleteRepeatPoint) == 1))
 	{
-		for (int i = 0; i < DeleteRepeatPoint.size()-num; i++)
+		int test = ToLeftTest(LTL, DeleteRepeatPoint[0], DeleteRepeatPoint[1]);
+		int i = 1;
+		while ((test == 0) && (DeleteRepeatPoint.size() >= 3) && (i + 1 < DeleteRepeatPoint.size()))
 		{
-			int test = ToLeftTest(LTL, DeleteRepeatPoint[i], DeleteRepeatPoint[i+1]);
-			if (test == 1)
-			{
-				Point temp;
-				temp = DeleteRepeatPoint[i];
-				DeleteRepeatPoint[i] = DeleteRepeatPoint[i + 1];
-				DeleteRepeatPoint[i + 1] = temp;
-			}
+			test = ToLeftTest(LTL, DeleteRepeatPoint[i], DeleteRepeatPoint[i+1]);
+			i = i + 1;
 		}
-	} //冒泡排序
+		if (test == -1)
+		{
+			return DeleteRepeatPoint;
+		}
+	}
+	DeleteRepeatPoint.erase(DeleteRepeatPoint.begin());
+
+	DeleteRepeatPoint = MergeSortRecur(LTL, DeleteRepeatPoint, 0, DeleteRepeatPoint.size()-1);//归并排序
+	//for (int num = 1; num < DeleteRepeatPoint.size() ; num++)
+	//{
+	//	for (int i = 0; i < DeleteRepeatPoint.size()-num; i++)
+	//	{
+	//		int test = ToLeftTest(LTL, DeleteRepeatPoint[i], DeleteRepeatPoint[i+1]);
+	//		if (test == 1)
+	//		{
+	//			Point temp;
+	//			temp = DeleteRepeatPoint[i];
+	//			DeleteRepeatPoint[i] = DeleteRepeatPoint[i + 1];
+	//			DeleteRepeatPoint[i + 1] = temp;
+	//		}
+	//	}
+	//} //冒泡排序
 	return DeleteRepeatPoint;
 }
 int IfInLine(Point A, Point B,Point C) 
@@ -974,10 +993,12 @@ int IfInLine(Point A, Point B,Point C)
 vector <Point> GetCHGrahamScan(vector<Point> Points)
 {
 	Point LTL = FindLowestThenLeftmostPoint(Points);
-	vector <Point> T_Stack = PreSorting(Points, LTL); //主要耗费时间耗费在排序这里了
+	vector <Point> T_Stack;
+
+	T_Stack = PreSorting(Points, LTL); //主要耗费时间耗费在排序这里了
+
 	Point NextEP = *(T_Stack.end()-1);
 	T_Stack.pop_back();
-
 	vector <Point> S_Stack;
 	S_Stack.push_back(LTL);
 	S_Stack.push_back(NextEP);
@@ -1018,5 +1039,125 @@ vector <Point> GetCHGrahamScan(vector<Point> Points)
 	}
 	S_Stack = EraseVectorPoints(S_Stack, eraseIndex);
 	return S_Stack;
+}
 
+vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
+//不包括排序的GS算法
+//输入应该是Points排好序的 应该保证逆时针的顺序
+{
+	int LTLindex = FindLowestThenLeftmost(Points);
+	//Point LTL = FindLowestThenLeftmostPoint(Points);
+	vector <Point> T_Stack;
+
+	for (int i = LTLindex - 1; i >= 0; i--)
+		if (Points[i]!=Points[LTLindex])
+			T_Stack.push_back(Points[i]);
+	for (int i = Points.size()-1; i >= LTLindex + 1; i--)
+		if (Points[i] != Points[LTLindex])
+			T_Stack.push_back(Points[i]);
+
+	//T_Stack = Points;
+	//T_Stack = PreSorting(Points, LTL); //主要耗费时间耗费在排序这里了
+
+	Point NextEP = *(T_Stack.end() - 1);
+	T_Stack.pop_back();
+	vector <Point> S_Stack;
+	S_Stack.push_back(Points[LTLindex]);
+	S_Stack.push_back(NextEP);
+	while (T_Stack.empty() == 0)
+	{
+		Point A = *(S_Stack.end() - 2);
+		Point B = *(S_Stack.end() - 1);
+		Point C = *(T_Stack.end() - 1);
+		int test = ToLeftTest(A, B, C);
+		if (test == 0)
+		{
+			int ifinli = IfInLine(A, B, C);
+			if (ifinli == 1 || ifinli == -2 || ifinli == -3)
+				T_Stack.pop_back();
+			else if (ifinli == -1)
+			{
+				S_Stack.push_back(C);
+				T_Stack.pop_back();
+			}
+		}
+		else if (test == 1)
+		{
+			S_Stack.push_back(C);
+			T_Stack.pop_back();
+		}
+		else if (test == -1)
+		{
+			S_Stack.pop_back();
+		}
+	}
+	vector<int> eraseIndex; //删除共线的点内部的所有点
+	for (int i = 0; i < S_Stack.size() - 2; i++)
+	{
+		if (ToLeftTest(S_Stack[i], S_Stack[i + 1], S_Stack[i + 2]) == 0)
+		{
+			eraseIndex.push_back(i + 1);
+		}
+	}
+	S_Stack = EraseVectorPoints(S_Stack, eraseIndex);
+	return S_Stack;
+}
+
+vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
+{
+	vector <Point> Result;
+	if (Right - Left <= 2)
+	{
+		for (int i = Left; i <= Right; i++)
+		{
+			Result.push_back(Points[i]);
+		}
+		Result = BubbleSortPoints(Result);
+		return Result;
+	}
+	int split1Left = Left;
+	int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+	int split2Left = split1Right + 1;
+	int split2Right = Right;
+
+	vector <Point> CH1, CH2;
+	CH1 = DivideAndMergeCH(Points, split1Left, split1Right);
+	CH2 = DivideAndMergeCH(Points, split2Left, split2Right);
+
+	Point Start1 = CH1[0];
+	Point Start2 = CH2[0];
+	auto  i = CH1.begin()+1;
+	while (i!=CH1.end())
+	{
+		if (*i == Start1)
+			i = CH1.erase(i);
+		else
+		{
+			Start1 = *i;
+			i++;
+		}
+	}
+	i = CH2.begin() + 1;
+	while (i != CH2.end())
+	{
+		if (*i == Start2)
+			i = CH2.erase(i);
+		else
+		{
+			Start2 = *i;
+			i++;
+		}
+	}//首先要去除重复点。由于是逆时针排好序的，所以线性复杂度即可去除完毕重复点
+
+
+	for (int i = 0; i < CH2.size(); i++)
+		CH1.push_back(CH2[i]);
+	//return GetCHGrahamScanWithoutSort(CH1);
+	return CH1;
+}
+
+vector <Point> GetCHDivideMerge(vector <Point> Points)
+//通过分治融合得到凸包。
+{
+	return DivideAndMergeCH(Points, 0, Points.size() - 1);
 }

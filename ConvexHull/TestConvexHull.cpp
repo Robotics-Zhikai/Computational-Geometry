@@ -214,27 +214,7 @@ void Test_GetConvexHull_GS()//GrahamScan算法
 	
 	vector <Point> Points;
 
-
-	Points = GenerateRandomPoint(5000, 0, 10, 1, 10);
-	//Points.push_back(Point(11, 5, 0));
-	//Points.push_back(Point(10, 0.5, 0));
-	//
-
-	/*Points.push_back(Point(0.1, 0.5, 0));
-	Points.push_back(Point(0.2, 0.5, 0));
-	Points.push_back(Point(0.3, 0.5, 0));
-	Points.push_back(Point(0.3, 0.5, 0));
-	Points.push_back(Point(0.2, 0.5, 0));
-	Points.push_back(Point(0.1, 0.5, 0));*/
-	/*for (double i = 0; i < 10; i=i+0.1)
-	{
-	Points.push_back(Point(i, 0.5, 0));
-	}
-	for (double i = 10; i > 0; i = i - 0.1)
-	{
-	Points.push_back(Point(i, 0.5, 0));
-	}
-	*/
+	Points = GenerateRandomPoint(550000, 0, 10, 1, 10);
 
 	vector <Point> Points2;
 	Points2 = GenerateRandomPoint(850, 0, 9.99, 0.5, 0.5);
@@ -249,7 +229,6 @@ void Test_GetConvexHull_GS()//GrahamScan算法
 		Points.push_back(Points2[i]);
 	}
 	
-
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
 	start = clock();
@@ -270,7 +249,49 @@ void Test_GetConvexHull_GS()//GrahamScan算法
 	AddBufferLines(temp, 1.0f);
 	cout <<"凸包的顶点个数："<< Points.size() - 1 << endl;
 	CloseGLplot();
+}
 
+void Test_GetCHDivideMerge()
+{
+	clock_t start, end;
+
+	vector <Point> Points;
+
+	Points = GenerateRandomPoint(50000, 0, 10, 1, 10);
+
+	vector <Point> Points2;
+	Points2 = GenerateRandomPoint(850, 0, 9.99, 0.5, 0.5);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
+	//Points.push_back(Point(-1, 0.5, 0));
+	Points2 = GenerateRandomPoint(850, 9, 9, 0.5, 10);
+	for (int i = 0; i < Points2.size(); i++)
+	{
+		Points.push_back(Points2[i]);
+	}
+
+	OpenGLplot();
+	AddBufferPoints(Points, 2.0f);
+	start = clock();
+	cout << "求" << Points.size() << "个点的凸包" << endl;
+	Points = GetCHDivideMerge(Points);
+	end = clock();
+
+	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "GetCHDivideMerge算法用时" << endtime << "s" << endl;
+
+	AddBufferPoints(Points, 5.0f);
+	vector <Point> temp = Points;
+	//temp.push_back(Points[0]);
+
+	//Points = BubbleSortPoints(Points);
+	temp = Points;
+	temp.push_back(Points[0]);
+	AddBufferLines(temp, 1.0f);
+	cout << "凸包的顶点个数：" << Points.size() - 1 << endl;
+	CloseGLplot();
 }
 
 void main()
@@ -283,7 +304,8 @@ void main()
 	//Test_GetConvexHull_IC();
 	//Test_ICPT();
 	//Test_GetConvexHull_JM();
-	Test_GetConvexHull_GS();
+	//Test_GetConvexHull_GS();
+	Test_GetCHDivideMerge();
 }
 
 	
