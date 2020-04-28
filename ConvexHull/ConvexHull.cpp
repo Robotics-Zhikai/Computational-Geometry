@@ -801,6 +801,122 @@ Point FindLowestThenRightmostPoint(vector <Point> Points)
 	//return Index;
 }
 
+void TwoSplitMerge(Point & ref,vector<Point> & Points, vector<Point> & tmp, int split1Left, int split1Right, int split2Left, int split2Right)
+{
+	//if (Left == Right)
+	//	return;
+
+	//int split1Left = Left;
+	//int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+	//int split2Left = split1Right + 1;
+	//int split2Right = Right;
+
+	int split1 = split1Left;
+	int split2 = split2Left;
+	int tmpzz = 0;
+	while (split1 <= split1Right && split2 <= split2Right)
+	{
+		int test = ToLeftTest(ref, Points[split1], Points[split2]);
+		if (test == 1)
+		{
+			tmp[split1Left + tmpzz] = Points[split2];
+			split2++;
+			tmpzz++;
+		}
+		else if (test == -1)
+		{
+			tmp[split1Left + tmpzz] = Points[split1];
+			split1++;
+			tmpzz++;
+		}
+		else if (test == 0)
+		{
+			tmp[split1Left + tmpzz] = Points[split1];
+			split1++;
+			tmpzz++;
+			tmp[split1Left + tmpzz] = Points[split2];
+			split2++;
+			tmpzz++;
+		}
+		/*if (Data[split2] < Data[split1])
+		{
+			tmp[split1Left + tmpzz] = Data[split2];
+			split2++;
+			tmpzz++;
+		}*/
+		/*else if (Data[split2] > Data[split1])
+		{
+			tmp[split1Left + tmpzz] = Data[split1];
+			split1++;
+			tmpzz++;
+		}*/
+		/*else
+		{
+			tmp[split1Left + tmpzz] = Data[split1];
+			split1++;
+			tmpzz++;
+			tmp[split1Left + tmpzz] = Data[split2];
+			split2++;
+			tmpzz++;
+		}*/
+	}
+	while (split1 <= split1Right)
+	{
+		tmp[split1Left + tmpzz] = Points[split1];
+		tmpzz++;
+		split1++;
+	}
+	while (split2 <= split2Right)
+	{
+		tmp[split1Left + tmpzz] = Points[split2];
+		tmpzz++;
+		split2++;
+	}
+	tmpzz--;
+	while (tmpzz >= 0) //需要把融合后的一段序列返回到Data中
+	{
+		Points[split1Left + tmpzz] = tmp[split1Left + tmpzz];
+		tmpzz--;
+	}
+}
+
+void Merge(Point & ref,vector <Point> & Points, vector<Point> & tmp, int Left, int Right)
+{
+	if (Right - Left == 1)
+	{
+		int test = ToLeftTest(ref, Points[Left], Points[Right]);
+		if (test == 1)
+		{
+			Point temp;
+			temp = Points[Left];
+			Points[Left] = Points[Right];
+			Points[Right] = temp;
+		}
+		return;
+	}
+	else if (Right == Left)
+		return;
+	int split1Left = Left;
+	int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+	int split2Left = split1Right + 1;
+	int split2Right = Right;
+
+	Merge(ref,Points, tmp, Left, split1Right);
+	Merge(ref,Points, tmp, split2Left, split2Right);
+
+	TwoSplitMerge(ref,Points, tmp, split1Left, split1Right, split2Left, split2Right);
+	return;
+}
+
+vector <Point> MergeSortRecur(Point ref,vector <Point> Points, int Left, int Right)
+{
+	if (Points.size() <= 1)
+		return Points;
+	vector <Point> tmp = Points;
+	Merge(ref,Points, tmp, Left, Right);
+	return Points;
+}
+
 vector <Point> PreSorting(vector <Point> Points, Point LTL)
 {
 	vector <Point> DeleteRepeatPoint;
@@ -810,6 +926,7 @@ vector <Point> PreSorting(vector <Point> Points, Point LTL)
 			continue;
 		DeleteRepeatPoint.push_back(Points[i]);
 	}
+	//DeleteRepeatPoint = MergeSortRecur(LTL, DeleteRepeatPoint, 0, DeleteRepeatPoint.size()-1);//归并排序
 	for (int num = 1; num < DeleteRepeatPoint.size() ; num++)
 	{
 		for (int i = 0; i < DeleteRepeatPoint.size()-num; i++)
@@ -823,7 +940,7 @@ vector <Point> PreSorting(vector <Point> Points, Point LTL)
 				DeleteRepeatPoint[i + 1] = temp;
 			}
 		}
-	}
+	} //冒泡排序
 	return DeleteRepeatPoint;
 }
 int IfInLine(Point A, Point B,Point C) 

@@ -1,6 +1,7 @@
 #include "ConvexHull.h"
 #include "Visualization.h"
-
+#include <time.h>
+#include <math.h>
 
 vector<Point> GenerateRandomPoint(int pointsNum, float RangeXmin, float RangeXmax, float RangeYmin, float RangeYmax)
 //generate pointsNum random points in [RangeXmin,RangeXmax,RangeYmin,RangeYmax]
@@ -209,6 +210,8 @@ void Test_GetConvexHull_JM()//jarvis march算法
 
 void Test_GetConvexHull_GS()//GrahamScan算法
 {
+	clock_t start, end;
+	
 	vector <Point> Points;
 
 
@@ -249,7 +252,14 @@ void Test_GetConvexHull_GS()//GrahamScan算法
 
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
+	start = clock();
+	cout << "求" << Points.size() << "个点的凸包" << endl;
 	Points = GetCHGrahamScan(Points);
+	end = clock();
+
+	double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << "GrahamScan算法用时" << endtime << "s" << endl;
+
 	AddBufferPoints(Points, 5.0f);
 	vector <Point> temp = Points;
 	//temp.push_back(Points[0]);
@@ -258,7 +268,7 @@ void Test_GetConvexHull_GS()//GrahamScan算法
 	temp = Points;
 	temp.push_back(Points[0]);
 	AddBufferLines(temp, 1.0f);
-	cout << Points.size() - 1 << endl;
+	cout <<"凸包的顶点个数："<< Points.size() - 1 << endl;
 	CloseGLplot();
 
 }
