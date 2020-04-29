@@ -159,6 +159,76 @@ int CheckSorted(vector<Point> Points)
 	return 1;
 }
 
+int CheckSortedCW(vector <Point> Points) 
+//判断是否是逆时针有序  
+//是返回1，否则返回0
+{
+	if (Points.size() < 3)
+		return 1;
+	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
+	Points1.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+		if ((Points[i] == Points[0]) == 0)
+			Points1.push_back(Points[i]);
+	Points = Points1;
+
+	int lastcomresult;
+	if (Points.size() >= 3)
+		lastcomresult = ComparePoint(Points[0], Points[1], Points[2]);
+	if (lastcomresult == 1)
+		return 0;
+
+	for (int i = 2; i < Points.size() - 1; i++)
+	{
+		int comresult = ComparePoint(Points[0], Points[i], Points[i + 1]);
+		if  ((lastcomresult == -1 || lastcomresult == 0) && (comresult == -1 || comresult == 0))
+		{
+		}
+		else
+		{
+			return 0;
+		}
+		lastcomresult = comresult;
+	}
+	return 1;
+}
+
+vector<Point> BubbleSortPointsCW(vector <Point> Points)
+//逆时针冒泡排序
+//冒泡排序排序点集 O(n^2) 不一定是极点集
+//虽然不一定是极点集，但是只有极点集排序才有意义，若普通点集排序则会出现没有啥几何意义的情况
+//去掉第一个点重复的情况
+{
+	if (CheckSortedCW(Points) == 1) //说明已经逆时针排好序了
+		return Points;
+	vector <Point> Points1; //除去重复Points[0],只保留一个Points[0]的点集
+	Points1.push_back(Points[0]);
+	for (int i = 1; i < Points.size(); i++)
+		if ((Points[i] == Points[0]) == 0)
+			Points1.push_back(Points[i]);
+	Points = Points1;
+
+	for (int num = 1; num < Points.size() - 1; num++)
+	{
+		for (int i = 1; i < Points.size() - num; i++)
+		{
+			int compareresult = ComparePoint(Points[0], Points[i], Points[i + 1]);
+			if (compareresult == 1)
+			{
+				Point temp = Points[i];
+				Points[i] = Points[i + 1];
+				Points[i + 1] = temp;
+			}
+			else if (compareresult == -2) //出现这种情况是排序的初始点有重合,但一开始的代码已经保证了不会出现这样的情况
+			{
+				printf("sort erro");
+				break;
+			}
+		}
+	}
+	return Points;
+}
+
 vector<Point> BubbleSortPoints(vector <Point> Points)
 //冒泡排序排序点集 O(n^2) 不一定是极点集
 //虽然不一定是极点集，但是只有极点集排序才有意义，若普通点集排序则会出现没有啥几何意义的情况
@@ -1049,6 +1119,7 @@ vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
 	//Point LTL = FindLowestThenLeftmostPoint(Points);
 	vector <Point> T_Stack;
 
+	//T_Stack.push_back(Points[LTLindex]);
 	for (int i = LTLindex - 1; i >= 0; i--)
 		if (Points[i]!=Points[LTLindex])
 			T_Stack.push_back(Points[i]);
@@ -1089,6 +1160,11 @@ vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
 		else if (test == -1)
 		{
 			S_Stack.pop_back();
+			if (S_Stack.size() == 1 && T_Stack.empty()==0)
+			{
+				S_Stack.push_back(*(T_Stack.end() - 1));
+				T_Stack.pop_back();
+			}
 		}
 	}
 	vector<int> eraseIndex; //删除共线的点内部的所有点
@@ -1103,6 +1179,224 @@ vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
 	return S_Stack;
 }
 
+void TwoWayMergeStar(vector <Point> & resulttmp,Point center,vector <Point> & CH1, vector <Point> & CH2)
+//两个星星多边形的归并
+//两个逆时针顺序凸包二路归并
+//最终结果储存在resulttmp中
+{
+	int index1 = 0;
+	int index2 = 0;
+	while (index1 < CH1.size() && index2 < CH2.size())
+	{
+		int test = ToLeftTest(center, CH1[index1], CH2[index2]);
+		if (test == -1)
+		{
+			resulttmp.push_back(CH2[index2]);
+			index2++;
+		}
+		else if (test == 1)
+		{
+			resulttmp.push_back(CH1[index1]);
+			index1++;
+		}
+		else
+		{
+			if (CH1[index1] == CH2[index2])
+			{
+				resulttmp.push_back(CH1[index1]);
+				//resulttmp.push_back(CH2[index2]);
+				index1++;
+				index2++;
+			}
+			else
+			{
+				double r = (CH1[index1] - center).dot(CH2[index2] - center);
+				if (r >= 0)
+				{
+					resulttmp.push_back(CH1[index1]);
+					resulttmp.push_back(CH2[index2]);
+					index1++;
+					index2++;
+				}
+				else
+				{
+					int result1 = ToLeftTest(center, resulttmp[resulttmp.size() - 1], CH1[index1]);
+					if (result1 == 1)
+					{
+						resulttmp.push_back(CH1[index1]);
+						index1++;
+					}
+					else if (result1 == 0)
+					{
+						double r1 = (CH1[index1] - center).dot(resulttmp[resulttmp.size() - 1] - center);
+						if (r1 >= 0)
+						{
+							resulttmp.push_back(CH1[index1]);
+							index1++;
+						}
+					}
+					int result2 = ToLeftTest(center, resulttmp[resulttmp.size() - 1], CH2[index2]);
+					if (result2 == 1)
+					{
+						resulttmp.push_back(CH2[index2]);
+						index2++;
+					}
+					else if (result2 == 0)
+					{
+						double r2 = (CH2[index2] - center).dot(resulttmp[resulttmp.size() - 1] - center);
+						if (r2 >= 0)
+						{
+							resulttmp.push_back(CH2[index2]);
+							index2++;
+						}
+					}
+				}
+			}
+		}
+	}
+	while (index1 < CH1.size())
+	{
+		resulttmp.push_back(CH1[index1]);
+		index1++;
+	}
+	while (index2 < CH2.size())
+	{
+		resulttmp.push_back(CH2[index2]);
+		index2++;
+	}
+}
+
+void TwoWayMergeNew(vector <Point> & resulttmp, vector <Point> & CH1, vector <Point> & CH2)
+//上边那个函数按照center去归并似乎是不行的，最后归并的点集并不是按照极角顺序
+//按这个函数排序还是不行的，还是需要用上边的那个排！
+{
+	if (CH1.size() == 0 && CH2.size() != 0)
+	{
+		for (int i = 0;i<CH2.size();i++)
+			resulttmp.push_back(CH2[i]);
+		return;
+	}
+	else if (CH2.size() == 0 && CH1.size() != 0)
+	{
+		for (int i = 0; i<CH1.size(); i++)
+			resulttmp.push_back(CH1[i]);
+		return;
+	}
+	else if (CH1.size() == 0 && CH2.size() == 0)
+	{
+		return;
+	}
+
+	int ltlch1 = FindLowestThenLeftmost(CH1);
+	int mov = CH1.size() - ltlch1;
+	vector <Point> New = CH1;
+	for (int i = 0; i < CH1.size(); i++)
+	{
+		int nmov;
+		if (i + mov >= CH1.size())
+			nmov = i + mov - CH1.size();
+		New[nmov] = CH1[i];
+	}
+	CH1 = New;
+
+	int ltlch2 = FindLowestThenLeftmost(CH2);
+	mov = CH2.size() - ltlch2;
+	New = CH2;
+	for (int i = 0; i < CH2.size(); i++)
+	{
+		int nmov;
+		if (i + mov >= CH2.size())
+			nmov = i + mov - CH2.size();
+		New[nmov] = CH2[i];
+	}
+	CH2 = New;
+
+	vector <Point> LTL;
+	LTL.push_back(CH1[0]);
+	LTL.push_back(CH2[0]);
+	int ltltmp = FindLowestThenLeftmost(LTL);
+	Point ref;
+	int index1 =0;
+	int index2 =0;
+	if (ltltmp == 0)
+	{
+		ref = CH1[0];
+		index1++;
+	}
+	else if (ltltmp == 1)
+	{
+		ref = CH2[0];
+		index2++;
+	}
+
+	resulttmp.push_back(ref);
+	
+	while (index1 < CH1.size() && index2 < CH2.size())
+	{
+		int test = ToLeftTest(ref, CH1[index1], CH2[index2]);
+		if (test == -1)
+		{
+			resulttmp.push_back(CH2[index2]);
+			index2++;
+		}
+		else if (test == 1)
+		{
+			resulttmp.push_back(CH1[index1]);
+			index1++;
+		}
+		else
+		{
+			resulttmp.push_back(CH1[index1]);
+			resulttmp.push_back(CH2[index2]);
+			index1++;
+			index2++;
+		}
+	}
+	while (index1 < CH1.size())
+	{
+		resulttmp.push_back(CH1[index1]);
+		index1++;
+	}
+	while (index2 < CH2.size())
+	{
+		resulttmp.push_back(CH2[index2]);
+		index2++;
+	}
+}
+
+void TwoWayMerge1dot5(vector <Point> & resulttmp, Point center, vector <Point> & CH1, vector <Point> & CH2)
+//包含一个完整的星星多边形 和一个不完整的线段
+{
+	int ltlch1 = FindLowestThenLeftmost(CH1);
+	int mov = CH1.size() - ltlch1;
+	vector <Point> New = CH1;
+	for (int i = 0; i < CH1.size(); i++)
+	{
+		int nmov;
+		if (i + mov >= CH1.size())
+			nmov = i + mov - CH1.size();
+		New[nmov] = CH1[i];
+	}
+	CH1 = New;
+
+	int ltlch2 = FindLowestThenLeftmost(CH2);
+	mov = CH2.size() - ltlch2;
+	New = CH2;
+	for (int i = 0; i < CH2.size(); i++)
+	{
+		int nmov;
+		if (i + mov >= CH2.size())
+			nmov = i + mov - CH2.size();
+		New[nmov] = CH2[i];
+	}
+	CH2 = New;
+
+	for (int i = 0; i < CH1.size()-1; i++)
+	{
+
+	}
+}
+
 vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 {
 	vector <Point> Result;
@@ -1112,7 +1406,7 @@ vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 		{
 			Result.push_back(Points[i]);
 		}
-		Result = BubbleSortPoints(Result);
+		Result = BubbleSortPointsCW(Result);//逆时针排序
 		return Result;
 	}
 	int split1Left = Left;
@@ -1149,11 +1443,108 @@ vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 		}
 	}//首先要去除重复点。由于是逆时针排好序的，所以线性复杂度即可去除完毕重复点
 
+	//然后是二路归并
+	Point center;
+	int whichc = 0;
+	if (CH1.size() == 1 && CH2.size() == 1)
+	{
+		Result.push_back(CH1[0]);
+		Result.push_back(CH2[0]);
+		return Result;
+	}
+	else if (CH1.size() == 1 && CH2.size() != 1)
+	{
+		if (CH2.size() == 2)
+			center = (CH2[0] + CH2[1]).multiple(double(1.0 / 2.0));
+		else
+			center = (CH2[0] + CH2[ceil(double((CH2.size() - 1) / 2.0))] + CH2[CH2.size() - 1]).multiple(double(1.0 / 3.0));
+		whichc = 2;
+		if (center == CH1[0])
+			return CH2;
+	}
+	else if (CH1.size() != 1 && CH2.size() == 1)
+	{
+		if (CH1.size() == 2)
+			center = (CH1[0] + CH1[1]).multiple(double(1.0 / 2.0));
+		else
+			center = (CH1[0] + CH1[ceil(double((CH1.size() - 1) / 2.0))] + CH1[CH1.size() - 1]).multiple(double(1.0 / 3.0));
+		whichc = 3;
+		if (center == CH2[0])
+			return CH1;
+	}
+	else
+	{
+		if (CH1.size() == 2)
+			center = (CH1[0] + CH1[1]).multiple(double(1.0 / 2.0));
+		else
+			center = (CH1[0] + CH1[ceil(double((CH1.size() - 1) / 2.0))] + CH1[CH1.size() - 1]).multiple(double(1.0 / 3.0));
+		whichc = 4;
+	}//把特殊和非特殊情况分出来
 
-	for (int i = 0; i < CH2.size(); i++)
-		CH1.push_back(CH2[i]);
-	//return GetCHGrahamScanWithoutSort(CH1);
-	return CH1;
+	
+	vector <Point> resulttmp;
+	if (((whichc == 4) && (InConvexPolygonTest(CH2, center) != -1)) || whichc == 2 || whichc == 3)
+	{
+		TwoWayMergeStar(resulttmp, center ,CH1, CH2);
+	}
+	else //if ((whichc == 4) && (InConvexPolygonTest(CH2, center) == -1))
+	{
+		if (CH2.size() <= 2)
+		{
+			TwoWayMerge1dot5(resulttmp, center, CH1, CH2);
+			//resulttmp.push_back(center);
+			//for (int i = 0; i < CH2.size(); i++)
+			//{
+			//	resulttmp.push_back(CH2[i]);
+			//}
+			//resulttmp = BubbleSortPointsCW(resulttmp);//逆时针排序
+		}
+		else
+		{
+			vector <int> TangentpIndex;
+			for (int i = 0; i < CH2.size(); i++)
+			{
+				Point Leftp;
+				Point Rightp;
+				if (i == 0)
+				{
+					Leftp = CH2[CH2.size() - 1];
+					Rightp = CH2[i + 1];
+				}
+				else if (i == CH2.size() - 1)
+				{
+					Leftp = CH2[i - 1];
+					Rightp = CH2[0];
+				}
+				else
+				{
+					Leftp = CH2[i - 1];
+					Rightp = CH2[i + 1];
+				}
+				int test1 = ToLeftTest(center, CH2[i], Leftp);
+				int test2 = ToLeftTest(center, CH2[i], Rightp);
+				if ((test1 == 1 && test2 == 1) || (test1 == -1 && test2 == -1))
+					TangentpIndex.push_back(i);
+				else if ((test1 == 0 && test2 == 1) || (test1 == 0 && test2 == -1))
+					TangentpIndex.push_back(i);
+				else if ((test2 == 0 && test1 == 1) || (test2 == 0 && test1 == -1))
+					TangentpIndex.push_back(i);
+			}
+			for (int i = 0;i<TangentpIndex.size();i++)
+			{
+				cout << TangentpIndex[i] << " ";
+			}
+			cout << endl;
+			for (auto i = CH2.begin()+TangentpIndex[1] + 1; i != CH2.end(); )
+				i = CH2.erase(i);
+			vector <int> erasenum;
+			for (int i = 0; i < TangentpIndex[0];i++)
+				erasenum.push_back(i);
+			CH2 = EraseVectorPoints(CH2, erasenum);
+			TwoWayMerge1dot5(resulttmp, center,CH1, CH2);
+		}
+	}
+	return GetCHGrahamScanWithoutSort(resulttmp);
 }
 
 vector <Point> GetCHDivideMerge(vector <Point> Points)

@@ -39,6 +39,36 @@ public:
 	{
 		return !(operator == (P2));
 	}
+	Point operator + (Point P2)
+	{
+		Point result;
+		result.Point_X = this->Point_X + P2.Point_X;
+		result.Point_Y = this->Point_Y + P2.Point_Y;
+		result.Point_Z = this->Point_Z + P2.Point_Z;
+		return result;
+	}
+	Point operator - (Point P2)
+	{
+		Point result;
+		result.Point_X = this->Point_X - P2.Point_X;
+		result.Point_Y = this->Point_Y - P2.Point_Y;
+		result.Point_Z = this->Point_Z - P2.Point_Z;
+		return result;
+	}
+	Point multiple (double num)
+	{
+		Point result;
+		result.Point_X = num * this->Point_X;
+		result.Point_Y = num * this->Point_Y;
+		result.Point_Z = num * this->Point_Z;
+		return result;
+	}
+	double dot(Point P2)
+	{
+		double result;
+		result = this->Point_X * P2.Point_X + this->Point_Y * P2.Point_Y + this->Point_Z * P2.Point_Z;
+		return result;
+	}
 };
 
 
