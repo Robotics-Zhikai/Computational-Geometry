@@ -1835,8 +1835,80 @@ vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 	return GetCHGrahamScanWithoutSort(resulttmp);
 }
 
+vector <Point> DivideAndMergeCHNew(vector <Point> & Points, int Left, int Right)
+//上边那个是待重新理解的东西。这个就是单纯的改了融合的算法
+{
+	vector <Point> Result;
+	if (Right - Left <= 2)
+	{
+		for (int i = Left; i <= Right; i++)
+		{
+			Result.push_back(Points[i]);
+		}
+
+		if (Result.size() == 3)
+		{
+			int flagthis = 0;
+			if (ToLeftTest(Result[0], Result[1], Result[2]) == 0)//对共线情况进行处理
+			{
+				if (flagthis == 0)
+				{
+					int test = IfInLine(Result[0], Result[1], Result[2]);
+					if (test == 1 || test == -2)
+					{
+						Result.erase(Result.begin() + 2);
+						flagthis = 1;
+					}
+				}
+				if (flagthis == 0)
+				{
+					int test = IfInLine(Result[0], Result[2], Result[1]);
+					if (test == 1 || test == -2)
+					{
+						Result.erase(Result.begin() + 1);
+						flagthis = 1;
+					}
+				}
+				if (flagthis == 0)
+				{
+					int test = IfInLine(Result[1], Result[2], Result[0]);
+					if (test == 1 || test == -2)
+					{
+						Result.erase(Result.begin());
+						flagthis = 1;
+					}
+				}
+			}
+		}
+		if (Result.size() == 2)
+		{
+			if (Result[0] == Result[1])
+			{
+				Result.pop_back();
+			}
+		}
+		Result = BubbleSortPointsCW(Result);//逆时针排序
+		return Result;
+	}
+	int split1Left = Left;
+	int split1Right = Left + ceil(double((Right - Left + 1) / 2.0)) - 1;
+	int split2Left = split1Right + 1;
+	int split2Right = Right;
+
+	vector <Point> CH1, CH2;
+	CH1 = DivideAndMergeCHNew(Points, split1Left, split1Right);
+	CH2 = DivideAndMergeCHNew(Points, split2Left, split2Right);
+
+	for (int i = 0; i < CH2.size(); i++)
+	{
+		CH1.push_back(CH2[i]);
+	}
+	CH1 = GetCHGrahamScan(CH1);
+	return CH1;
+}
 vector <Point> GetCHDivideMerge(vector <Point> Points)
 //通过分治融合得到凸包。
 {
-	return DivideAndMergeCH(Points, 0, Points.size() - 1);
+	//return DivideAndMergeCH(Points, 0, Points.size() - 1);//这个还需要有时间有机会重新思考
+	return DivideAndMergeCHNew(Points, 0, Points.size() - 1);//暂时先用这个简化版的能大体看出思路的方法来做
 }
