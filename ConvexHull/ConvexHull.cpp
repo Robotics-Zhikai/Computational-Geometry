@@ -1111,21 +1111,41 @@ vector <Point> GetCHGrahamScan(vector<Point> Points)
 	return S_Stack;
 }
 
+vector <Point> ModifyFirEle(vector <Point> Points,int pos)
+//保持逆时针顺序不变，将pos位置的元素放置到首位
+{
+	if (pos == 0)
+		return Points;
+	vector <Point> Result = Points;
+	int movvalue = pos;
+	for (int i = 0; i < Points.size(); i++)
+	{
+		int fakepos = i - movvalue;
+		if (fakepos < 0)
+			fakepos = Points.size() + fakepos;
+		Result[fakepos] = Points[i];
+	}
+	return Result;
+}
+
 vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
 //不包括排序的GS算法
 //输入应该是Points排好序的 应该保证逆时针的顺序
 {
-	int LTLindex = FindLowestThenLeftmost(Points);
+	//int LTLindex = FindLowestThenLeftmost(Points);
 	//Point LTL = FindLowestThenLeftmostPoint(Points);
-	vector <Point> T_Stack;
 
-	//T_Stack.push_back(Points[LTLindex]);
-	for (int i = LTLindex - 1; i >= 0; i--)
-		if (Points[i]!=Points[LTLindex])
-			T_Stack.push_back(Points[i]);
-	for (int i = Points.size()-1; i >= LTLindex + 1; i--)
-		if (Points[i] != Points[LTLindex])
-			T_Stack.push_back(Points[i]);
+	vector <Point> T_Stack;
+	for (int i = Points.size() - 1; i >= 1; i--)
+		T_Stack.push_back(Points[i]);
+
+
+	//for (int i = LTLindex - 1; i >= 0; i--)
+	//	if (Points[i]!=Points[LTLindex])
+	//		T_Stack.push_back(Points[i]);
+	//for (int i = Points.size()-1; i >= LTLindex + 1; i--)
+	//	if (Points[i] != Points[LTLindex])
+	//		T_Stack.push_back(Points[i]);
 
 	//T_Stack = Points;
 	//T_Stack = PreSorting(Points, LTL); //主要耗费时间耗费在排序这里了
@@ -1133,7 +1153,7 @@ vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
 	Point NextEP = *(T_Stack.end() - 1);
 	T_Stack.pop_back();
 	vector <Point> S_Stack;
-	S_Stack.push_back(Points[LTLindex]);
+	S_Stack.push_back(Points[0]);
 	S_Stack.push_back(NextEP);
 	while (T_Stack.empty() == 0)
 	{
@@ -1175,7 +1195,20 @@ vector <Point> GetCHGrahamScanWithoutSort(vector<Point> Points)
 			eraseIndex.push_back(i + 1);
 		}
 	}
-	S_Stack = EraseVectorPoints(S_Stack, eraseIndex);
+	S_Stack = EraseVectorPoints(S_Stack, eraseIndex); 
+	
+	Point tmp1 = S_Stack[S_Stack.size() - 2];
+	Point tmp2 = S_Stack[S_Stack.size() - 1];
+	Point tmp3 = S_Stack[0];
+	while (ToLeftTest(tmp1, tmp2, tmp3) == -1)
+	{
+		S_Stack.pop_back();
+		tmp1 = S_Stack[S_Stack.size() - 2];
+		tmp2 = S_Stack[S_Stack.size() - 1];
+		tmp3 = S_Stack[0];
+	}
+	//对某种特殊情况的处理
+
 	return S_Stack;
 }
 
@@ -1184,10 +1217,12 @@ void TwoWayMergeStar(vector <Point> & resulttmp,Point center,vector <Point> & CH
 //两个逆时针顺序凸包二路归并
 //最终结果储存在resulttmp中
 {
+	
 	int index1 = 0;
 	int index2 = 0;
 	while (index1 < CH1.size() && index2 < CH2.size())
 	{
+		
 		int test = ToLeftTest(center, CH1[index1], CH2[index2]);
 		if (test == -1)
 		{
@@ -1264,6 +1299,7 @@ void TwoWayMergeStar(vector <Point> & resulttmp,Point center,vector <Point> & CH
 		resulttmp.push_back(CH2[index2]);
 		index2++;
 	}
+
 }
 
 void TwoWayMergeNew(vector <Point> & resulttmp, vector <Point> & CH1, vector <Point> & CH2)
@@ -1366,35 +1402,87 @@ void TwoWayMergeNew(vector <Point> & resulttmp, vector <Point> & CH1, vector <Po
 
 void TwoWayMerge1dot5(vector <Point> & resulttmp, Point center, vector <Point> & CH1, vector <Point> & CH2)
 //包含一个完整的星星多边形 和一个不完整的线段
+//CH1是一个完整的多边形 CH2是切点切割后的局部线段
+//默认CH2没有共线的三个点 也没有重复的点
 {
-	int ltlch1 = FindLowestThenLeftmost(CH1);
-	int mov = CH1.size() - ltlch1;
-	vector <Point> New = CH1;
-	for (int i = 0; i < CH1.size(); i++)
-	{
-		int nmov;
-		if (i + mov >= CH1.size())
-			nmov = i + mov - CH1.size();
-		New[nmov] = CH1[i];
-	}
-	CH1 = New;
+	//ModifyFirEle(vector <Point> Points, int pos)
+	int  i;
 
-	int ltlch2 = FindLowestThenLeftmost(CH2);
-	mov = CH2.size() - ltlch2;
-	New = CH2;
-	for (int i = 0; i < CH2.size(); i++)
-	{
-		int nmov;
-		if (i + mov >= CH2.size())
-			nmov = i + mov - CH2.size();
-		New[nmov] = CH2[i];
-	}
-	CH2 = New;
+	//for (i = 0; i < CH2.size(); i++)
+	//{
+	//	if (CH2[i] == tangentpoint[0])
+	//		break;
+	//}
+	//CH2 = ModifyFirEle(CH2, i);
 
-	for (int i = 0; i < CH1.size()-1; i++)
-	{
+	int test1;
+	int test2;
+	//int type = 0; //把线段分成两种类型，类似于手性分子
+	//if (CH2.size() == 2)
+	//	type = 1;
+	//else
+	//{
+	//	if ((CH2[1] - CH2[0]).dot(CH2[2] - CH2[1]) > 0)
+	//		type = 1;
+	//	else
+	//		type = 2;
+	//}
 
+	//int i;
+	//if (type == 1)
+	//{
+	//}
+	//else if (type == 2)
+	//{
+	//	CH2 = ModifyFirEle(CH2, 1);
+	//}
+
+	for (i = 0; i < CH1.size(); i++)
+	{
+		test1 = ToLeftTest(center, CH1[i], CH2[0]);
+		if (test1 == 1 || test1 == 0)
+			break;
 	}
+	CH1 = ModifyFirEle(CH1, i);
+
+	int CH2i = 0;
+	for (i = 0; i < CH1.size(); i++)//360度扫一遍把二者融合
+	{
+		int leftindex = i;
+		int rightindex = i + 1;
+		if (rightindex >= CH1.size())
+			rightindex = 0;
+		resulttmp.push_back(CH1[i]);
+		test1 = ToLeftTest(center, CH1[leftindex], CH2[CH2i]);
+		test2 = ToLeftTest(center, CH1[rightindex], CH2[CH2i]);
+		int flag = 0;
+		while ((test1 == 1 || test1 == 0) && (test2 == -1 || test2 == 0))
+		{
+			flag = 1;
+			resulttmp.push_back(CH2[CH2i]);
+			CH2i++;
+			if (CH2i < CH2.size())
+			{
+				test1 = ToLeftTest(center, CH1[leftindex], CH2[CH2i]);
+				test2 = ToLeftTest(center, CH1[rightindex], CH2[CH2i]);
+			}
+			else
+			{
+				flag = -1;
+				break;
+			}
+		}
+		if (flag == 1);
+		else if (flag == -1)
+			break;
+	}
+	i++;
+	while (i < CH1.size())
+	{
+		resulttmp.push_back(CH1[i]);
+		i++;
+	}
+	return;
 }
 
 vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
@@ -1405,6 +1493,48 @@ vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 		for (int i = Left; i <= Right; i++)
 		{
 			Result.push_back(Points[i]);
+		}
+		
+		if (Result.size() == 3)
+		{
+			int flagthis = 0;
+			if (ToLeftTest(Result[0], Result[1], Result[2]) == 0)//对共线情况进行处理
+			{
+				if (flagthis == 0)
+				{
+					int test = IfInLine(Result[0], Result[1], Result[2]);
+					if (test == 1 || test == -2)
+					{
+						Result.erase(Result.begin() + 2);
+						flagthis = 1;
+					}
+				}
+				if (flagthis == 0)
+				{
+					int test = IfInLine(Result[0], Result[2], Result[1]);
+					if (test == 1 || test == -2)
+					{
+						Result.erase(Result.begin() + 1);
+						flagthis = 1;
+					}
+				}
+				if (flagthis == 0)
+				{
+					int test = IfInLine(Result[1], Result[2], Result[0]);
+					if (test == 1 || test == -2)
+					{
+						Result.erase(Result.begin());
+						flagthis = 1;
+					}
+				}
+			}
+		}
+		if (Result.size()==2)
+		{
+			if (Result[0] == Result[1])
+			{
+				Result.pop_back();
+			}
 		}
 		Result = BubbleSortPointsCW(Result);//逆时针排序
 		return Result;
@@ -1491,7 +1621,9 @@ vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 	{
 		if (CH2.size() <= 2)
 		{
+
 			TwoWayMerge1dot5(resulttmp, center, CH1, CH2);
+
 			//resulttmp.push_back(center);
 			//for (int i = 0; i < CH2.size(); i++)
 			//{
@@ -1530,19 +1662,175 @@ vector <Point> DivideAndMergeCH(vector <Point> & Points, int Left, int Right)
 				else if ((test2 == 0 && test1 == 1) || (test2 == 0 && test1 == -1))
 					TangentpIndex.push_back(i);
 			}
+
+			if (TangentpIndex.size() > 2)//当切点有好几个时有如下处理措施
+			{
+				vector <int> ErasetangentIndex;
+				vector <int> ErasePointIndex;
+				for (int i = 0; i < TangentpIndex.size(); i++)
+				{
+					Point A = CH2[TangentpIndex[i]];
+					for (int j = 0; j < TangentpIndex.size(); j++)
+					{
+						if (j != i)
+						{
+							Point B = CH2[TangentpIndex[j]];
+							int flag = 0;
+							for (int k = 0; k < ErasePointIndex.size(); k++)
+							{
+								if (TangentpIndex[i] == ErasePointIndex[k])
+								{
+									flag = 1;
+									break;
+								}
+								if (TangentpIndex[j] == ErasePointIndex[k])
+								{
+									flag = 2;
+									break;
+								}
+							}
+							if (flag == 1)
+								break;
+							if (flag == 2)
+								continue;
+							int testthis = ToLeftTest(center, A, B);
+							if (testthis == 0)
+							{
+								if (normPoints(center, A) <= normPoints(center, B))
+								{
+									ErasetangentIndex.push_back(i);
+									ErasePointIndex.push_back(TangentpIndex[i]);
+								}
+								else
+								{
+									ErasetangentIndex.push_back(j);
+									ErasePointIndex.push_back(TangentpIndex[j]);
+								}
+							}
+						}
+					}
+				}
+				TangentpIndex = EraseVectorint(TangentpIndex, ErasetangentIndex);
+				CH2 = EraseVectorPoints(CH2, ErasePointIndex);
+				cout << "大于2" << endl;
+			}
 			for (int i = 0;i<TangentpIndex.size();i++)
 			{
-				cout << TangentpIndex[i] << " ";
+				//cout << TangentpIndex[i] << " ";
 			}
-			cout << endl;
-			for (auto i = CH2.begin()+TangentpIndex[1] + 1; i != CH2.end(); )
-				i = CH2.erase(i);
-			vector <int> erasenum;
-			for (int i = 0; i < TangentpIndex[0];i++)
-				erasenum.push_back(i);
-			CH2 = EraseVectorPoints(CH2, erasenum);
+			cout << TangentpIndex.size()<<endl;
+			if (TangentpIndex.size() == 0)
+			{
+				cout << "s1";
+			}
+			
+			vector <Point> TangentPoint;
+			TangentPoint.push_back(CH2[TangentpIndex[0]]);
+			TangentPoint.push_back(CH2[TangentpIndex[1]]);
+			vector <int> eraseindex;
+			for (int i = 0; i < CH2.size(); i++)
+			{
+				if (i != TangentpIndex[0] && i != TangentpIndex[1])
+				{
+					if (CH2[i] == CH2[TangentpIndex[0]] || CH2[i] == CH2[TangentpIndex[1]])
+						eraseindex.push_back(i);
+				}
+			}
+			CH2 = EraseVectorPoints(CH2, eraseindex);//去除CH2中与切点重复的点
+			
+			if (eraseindex.size() != 0)
+			{
+				int tangsum = 0;
+				TangentpIndex.clear();
+				for (int i = 0; i < CH2.size(); i++)
+				{
+					if (CH2[i] == TangentPoint[tangsum])
+					{
+						TangentpIndex.push_back(i);
+						tangsum++;
+						if (tangsum >= 2)
+							break;
+					}
+				}//更新TangentpIndex
+			}
+			CH2 = ModifyFirEle(CH2, TangentpIndex[1]);
+			eraseindex.clear();
+			for (int i = TangentpIndex[1] + 1; i < CH2.size(); i++)
+			{
+				eraseindex.push_back(i);
+			}
+			CH2 = EraseVectorPoints(CH2, eraseindex);
+
+			/*int innerindex = -1;
+			int outerindex = -1;
+			int leftindex;
+			leftindex = TangentpIndex[0] - 1;
+			if (leftindex < 0)
+				leftindex = CH2.size() - 1;
+			if (TangentpIndex[1] - TangentpIndex[0] == 1 )
+			{
+				innerindex = -1;
+				if (CH2.size() == 2)
+					outerindex = -1;
+				else
+					outerindex = leftindex;
+			}
+			else
+			{
+				innerindex = TangentpIndex[0] + 1;
+				if (leftindex == TangentpIndex[1])
+					outerindex = -1;
+				else
+					outerindex = leftindex;
+			}
+			
+			vector <Point> NewCH2;
+			eraseindex.clear();
+			if (innerindex == -1 && outerindex == -1)
+			{
+				NewCH2 = CH2;
+			}
+			else if (innerindex == -1 && outerindex != -1)
+			{
+				int testtri = InTriangle(center, CH2[TangentpIndex[0]], CH2[TangentpIndex[1]], CH2[outerindex]);
+				if (testtri == 1 || testtri == 0)
+				{
+					NewCH2.push_back(CH2[TangentpIndex[0]]);
+					NewCH2.push_back(CH2[TangentpIndex[1]]);
+				}
+				else
+					NewCH2 = CH2;
+			}
+			else if (innerindex != -1 && outerindex == -1)
+			{
+				int testtri = InTriangle(center, CH2[TangentpIndex[0]], CH2[TangentpIndex[1]], CH2[innerindex]);
+				if (testtri == 1 || testtri == 0)
+				{
+					NewCH2.push_back(CH2[TangentpIndex[0]]);
+					NewCH2.push_back(CH2[TangentpIndex[1]]);
+				}
+				else
+					NewCH2 = CH2;
+			}
+			else if (innerindex != -1 && outerindex != -1)
+			{
+				int testtri = InTriangle(center, CH2[TangentpIndex[0]], CH2[TangentpIndex[1]], CH2[outerindex]);
+				if (testtri == 1 || testtri == 0)
+					for (int i = TangentpIndex[0]; i <= TangentpIndex[1]; i++)
+						NewCH2.push_back(CH2[i]);
+				else
+				{
+					for (int i = TangentpIndex[0] + 1; i < TangentpIndex[1]; i++)
+						eraseindex.push_back(i);
+					NewCH2 = EraseVectorPoints(CH2, eraseindex);
+				}
+			}
+			CH2 = NewCH2;*/
+			
 			TwoWayMerge1dot5(resulttmp, center,CH1, CH2);
+			
 		}
+		//TwoWayMerge1dot5(resulttmp, center, CH1, CH2);
 	}
 	return GetCHGrahamScanWithoutSort(resulttmp);
 }

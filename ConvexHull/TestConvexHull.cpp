@@ -257,20 +257,29 @@ void Test_GetCHDivideMerge()
 
 	vector <Point> Points;
 
-	Points = GenerateRandomPoint(50000, 0, 10, 1, 10);
+	//Points = GenerateRandomPoint(10, 0, 10, 1, 10);
+	Points.push_back(Point(1, 2, 0));
+	Points.push_back(Point(2, 3, 0));
+	Points.push_back(Point(3, 4, 0));
+	Points.push_back(Point(4, 5, 0));
+	Points.push_back(Point(5, 6, 0));
+	Points.push_back(Point(6, 7, 0));
+	Points.push_back(Point(4, 8, 0));
+	Points.push_back(Point(3, 9, 0));
+	Points.push_back(Point(2, 10, 0));
 
-	vector <Point> Points2;
-	Points2 = GenerateRandomPoint(850, 0, 9.99, 0.5, 0.5);
-	for (int i = 0; i < Points2.size(); i++)
-	{
-		Points.push_back(Points2[i]);
-	}
-	//Points.push_back(Point(-1, 0.5, 0));
-	Points2 = GenerateRandomPoint(850, 9, 9, 0.5, 10);
-	for (int i = 0; i < Points2.size(); i++)
-	{
-		Points.push_back(Points2[i]);
-	}
+	//vector <Point> Points2;
+	//Points2 = GenerateRandomPoint(850, 0, 9.99, 0.5, 0.5);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	Points.push_back(Points2[i]);
+	//}
+	////Points.push_back(Point(-1, 0.5, 0));
+	//Points2 = GenerateRandomPoint(850, 9, 9, 0.5, 10);
+	//for (int i = 0; i < Points2.size(); i++)
+	//{
+	//	Points.push_back(Points2[i]);
+	//}
 
 	OpenGLplot();
 	AddBufferPoints(Points, 2.0f);
@@ -304,8 +313,8 @@ void main()
 	//Test_GetConvexHull_IC();
 	//Test_ICPT();
 	//Test_GetConvexHull_JM();
-	//Test_GetConvexHull_GS();
-	Test_GetCHDivideMerge();
+	Test_GetConvexHull_GS();
+	//Test_GetCHDivideMerge();
 }
 
 	
