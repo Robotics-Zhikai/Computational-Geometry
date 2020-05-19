@@ -5,6 +5,18 @@
 
 ## 20200405 
   OpenGL相关函数的使用 封装可视化函数
+调用OpenGL非常简单，遵循下述流程即可。
+```
+OpenGLplot();
+```
+```
+//下边的两个函数可重复调用，但必须保证在OpenGLplot和CloseGLplot之间调用
+AddBufferPoints(vector<Point> Points, float sizepoint);//用于显示某一大小的点
+AddBufferLines(vector<Point> Points, float LineWidth);//用于显示某一宽度的直线，首尾相接
+```
+```
+CloseGLplot();
+```
 
 ## 20200406 
   O(n^4)的凸包算法 to-left-test 极点的冒泡排序 Point的比较
