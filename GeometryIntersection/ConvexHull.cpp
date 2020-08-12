@@ -1,5 +1,26 @@
 #include "ConvexHull.h"
 
+vector<Point> GenerateRandomPoint(int pointsNum, float RangeXmin, float RangeXmax, float RangeYmin, float RangeYmax)
+//generate pointsNum random points in [RangeXmin,RangeXmax,RangeYmin,RangeYmax]
+{
+	vector<Point> Points;
+	//srand((int)time(0));  // 产生随机种子  把0换成NULL也行
+	srand(0);
+	for (int i = 0; i < pointsNum; i++)
+	{
+		Point Pointtemp;
+		float a = RangeXmin;
+		float b = RangeXmax;
+		Pointtemp.Point_X = a + (rand() / double(RAND_MAX))*(b - a);
+		a = RangeYmin;
+		b = RangeYmax;
+		Pointtemp.Point_Y = a + (rand() / double(RAND_MAX))*(b - a);
+		Pointtemp.Point_Z = 0;
+		Points.push_back(Pointtemp);
+	}
+	return Points;
+}
+
 int ToLeftTest(Point PointA, Point PointB, Point PointC)
 //From PointA to PointB,Test PointC.Left return 1,right return -1,on return 0
 //Erro return -2 including z not equal and PointA==PointB
