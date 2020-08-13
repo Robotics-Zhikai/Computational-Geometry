@@ -1,5 +1,7 @@
 #include "Heap.h"
 
+HeapData Default;
+#define ElemenTypical Default
 
 void HeapOperate::SetMaxsizeHeap(int MaxSize)
 {

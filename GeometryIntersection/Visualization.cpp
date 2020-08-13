@@ -417,8 +417,8 @@ void AddBufferSequenceLine(vector<Point> Points, float LineWidth)
 void AddBufferLinesArrows(Segment seg, float LineWidth)
 {
 	vector<Point> Points;
-	Points.push_back(seg.L);
-	Points.push_back(seg.R);
+	Points.push_back(seg.GetLPoint());
+	Points.push_back(seg.GetRPoint());
 
 	for (int i = 0; i < Points.size(); i++)
 		GLplotLineArrowData.push_back(Points[i]);
@@ -445,8 +445,8 @@ void AddBufferHollowSquare(vector<Point> Points, float SquareSize)
 void AddBufferSegment(Segment seg, float LineWidth)
 {
 	vector<Point> Points;
-	Points.push_back(seg.L);
-	Points.push_back(seg.R);
+	Points.push_back(seg.GetLPoint());
+	Points.push_back(seg.GetRPoint());
 
 	for (int i = 0; i < Points.size(); i++)
 	{

@@ -24,6 +24,7 @@ public:
 		Point_Y = 0;
 		Point_Z = 0;
 	}
+
 	int operator == (Point P2)
 	{
 		if (this->Point_X == P2.Point_X&&this->Point_Y == P2.Point_Y&&this->Point_Z == P2.Point_Z)
@@ -86,16 +87,32 @@ int DistributeUniqueID();
 class Segment
 {
 public:
-	int ID;
-	Point L;
-	Point R;
-
-	vector <int> SegmentsID;//存放所有分配的Segment的ID
 
 	Segment(Point A, Point B)
 	{
-		Segment::L = A;
-		Segment::R = B;
+		if (A.Point_X > B.Point_X)
+		{
+			Segment::L = B;
+			Segment::R = A;
+		}
+		else if (A.Point_X == B.Point_X)
+		{
+			if (A.Point_Y <= B.Point_Y)
+			{
+				Segment::L = A;
+				Segment::R = B;
+			}
+			else
+			{
+				Segment::L = B;
+				Segment::R = A;
+			}
+		}
+		else
+		{
+			Segment::L = A;
+			Segment::R = B;
+		}
 		Segment::ID = DistributeUniqueID();
 	}
 
@@ -128,6 +145,25 @@ public:
 		else
 			return 0;
 	}
+
+	int GetID()
+	{
+		return this->ID;
+	}
+
+	Point GetLPoint()
+	{
+		return this->L;
+	}
+
+	Point GetRPoint()
+	{
+		return this->R;
+	}
+private:
+	int ID;
+	Point L;
+	Point R;
 };
 
 
