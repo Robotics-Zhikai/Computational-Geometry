@@ -91,3 +91,6 @@ CloseGLplot();
 
 ## 20200813
   完成优先级队列的数据结构的建立工作 开始着手BBST的状态线扫描的BBST数据结构工作，需要学习一下邓俊辉的数据结构BBST部分以及C++的模板部分
+
+## 20200817
+  在MATLAB实现时，发现convexhull.cpp to left test 的bug 和presortting的bug 进行了修复

@@ -24,6 +24,7 @@ vector<Point> GenerateRandomPoint(int pointsNum, float RangeXmin, float RangeXma
 int ToLeftTest(Point PointA, Point PointB, Point PointC)
 //From PointA to PointB,Test PointC.Left return 1,right return -1,on return 0
 //Erro return -2 including z not equal and PointA==PointB
+//当共线，但是差距过于大时，会出现area是-10次方量级的情况，造成误判，需要引起注意
 {
 	if ((!(PointA.Point_Z == PointB.Point_Z && PointB.Point_Z == PointC.Point_Z)) || (PointA == PointB))
 	{
@@ -1018,6 +1019,13 @@ vector <Point> PreSorting(vector <Point> Points, Point LTL)
 		DeleteRepeatPoint.push_back(Points[i]);
 	}
 
+	if (DeleteRepeatPoint.empty() == 1)
+	{
+		DeleteRepeatPoint = Points;
+		DeleteRepeatPoint.erase(DeleteRepeatPoint.begin());
+	}
+	
+
 	//用n的时间复杂度判断是否已经是排序完成
 	DeleteRepeatPoint.insert(DeleteRepeatPoint.begin(), LTL);
 	if ((DeleteRepeatPoint.size()>=2)&&(CheckSorted(DeleteRepeatPoint) == 1))
@@ -1031,6 +1039,7 @@ vector <Point> PreSorting(vector <Point> Points, Point LTL)
 		}
 		if (test == -1)
 		{
+			DeleteRepeatPoint.erase(DeleteRepeatPoint.begin());
 			return DeleteRepeatPoint;
 		}
 	}
