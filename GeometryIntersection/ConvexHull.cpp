@@ -1014,7 +1014,7 @@ vector <Point> PreSorting(vector <Point> Points, Point LTL)
 	vector <Point> DeleteRepeatPoint;
 	for (int i = 0; i < Points.size(); i++) 
 	{
-		if (Points[i] == LTL)
+		if ((Points[i] == LTL) || (Points[i]- LTL).norm()<1e-15) //与tolefttest的那个阈值有关系
 			continue;
 		DeleteRepeatPoint.push_back(Points[i]);
 	}
